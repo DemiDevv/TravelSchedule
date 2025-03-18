@@ -16,6 +16,9 @@ struct ContentView: View {
             Text("Hello, Yandex!")
         }
         .padding()
+        .onAppear {
+            exampleUsage()
+        }
     }
 }
 
