@@ -95,15 +95,39 @@ func exampleUsage() {
             
             let facade = TravelScheduleFacade(client: client, apikey: Secrets.apiKey)
             
-            // Пример использования фасада
-            let stations = try await facade.getNearestStations(lat: 59.864177, lng: 30.319163, distance: 50)
-            print("Nearest Stations: \(stations)")
+            // Пример использования всех сервисов через фасад
             
-            let schedule = try await facade.getScheduleBetweenStations(from: "s2000001", to: "s2000002", date: "2023-12-01")
-            print("Schedule between stations: \(schedule)")
+            // 1. Получение ближайших станций
+            let nearestStations = try await facade.getNearestStations(lat: 59.864177, lng: 30.319163, distance: 50)
+            print("Nearest Stations: \(nearestStations)")
             
-            let settlement = try await facade.getNearestSettlement(lat: 59.864177, lng: 30.319163, distance: 50)
-            print("Nearest Settlement: \(settlement)")
+            // 2. Получение расписания между станциями
+            let scheduleBetweenStations = try await facade.getScheduleBetweenStations(from: "s2000001", to: "s2000002", date: "2023-12-01")
+            print("Schedule Between Stations: \(scheduleBetweenStations)")
+            
+            // 3. Получение расписания по станции
+            let scheduleOnStation = try await facade.getScheduleOnStation(station: "s2000001", date: "2023-12-01")
+            print("Schedule On Station: \(scheduleOnStation)")
+            
+            // 4. Получение списка станций следования для нитки
+            let threadStations = try await facade.getThreadStations(uid: "12345", date: "2023-12-01")
+            print("Thread Stations: \(threadStations)")
+            
+            // 5. Получение ближайшего населенного пункта
+            let nearestSettlement = try await facade.getNearestSettlement(lat: 59.864177, lng: 30.319163, distance: 50)
+            print("Nearest Settlement: \(nearestSettlement)")
+            
+            // 6. Получение информации о перевозчике
+            let carrierInfo = try await facade.getCarrier(code: "SU", system: "iata")
+            print("Carrier Info: \(carrierInfo)")
+            
+            // 7. Получение списка всех станций
+            let stationsList = try await facade.getStationsList()
+            print("Stations List: \(stationsList)")
+            
+            // 8. Получение информации о копирайте
+            let copyrightInfo = try await facade.getCopyright()
+            print("Copyright Info: \(copyrightInfo)")
             
         } catch {
             print("Error occurred: \(error)")
