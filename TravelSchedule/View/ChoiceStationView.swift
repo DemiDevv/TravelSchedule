@@ -20,25 +20,48 @@ struct ChoiceStationView: View {
     ]
     
     @State private var searchText = ""
+    @State private var isSearching = false
 
     var body: some View {
-        List {
-            ForEach(filteredStations, id: \.self) { station in
-                Button(action: {
-                    selected = CityStation(city: city, station: station)
-                    dismiss()
-                    presentationMode.wrappedValue.dismiss()
-                }) {
-                    RowView(title: station)
+        VStack(spacing: 0) {
+            // Кастомная поисковая строка
+            SearchBar(text: $searchText, isSearching: $isSearching)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+                .background(Color.white)
+            
+            // Основное содержимое
+            if filteredStations.isEmpty && !searchText.isEmpty {
+                // Сообщение, если ничего не найдено
+                VStack {
+                    Spacer()
+                    Text("Станция не найдена")
+                        .font(.system(size: 24))
+                        .foregroundColor(.blackYP)
+                    Spacer()
                 }
-                .listRowInsets(EdgeInsets())
-                .listRowSeparator(.hidden)
-                .listRowBackground(Color.white)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(Color.white)
+            } else {
+                // Список станций
+                List {
+                    ForEach(filteredStations, id: \.self) { station in
+                        Button(action: {
+                            selected = CityStation(city: city, station: station)
+                            dismiss()
+                            presentationMode.wrappedValue.dismiss()
+                        }) {
+                            RowView(title: station)
+                        }
+                        .listRowInsets(EdgeInsets())
+                        .listRowSeparator(.hidden)
+                        .listRowBackground(Color.white)
+                    }
+                }
+                .listStyle(PlainListStyle())
             }
         }
-        .listStyle(PlainListStyle())
         .background(Color.white)
-        .searchable(text: $searchText, prompt: "Введите запрос")
         .navigationTitle("Выбор станции")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
@@ -52,6 +75,9 @@ struct ChoiceStationView: View {
                         .font(.system(size: 20, weight: .bold))
                 }
             }
+        }
+        .onChange(of: searchText) { _ in
+            isSearching = !searchText.isEmpty
         }
     }
 

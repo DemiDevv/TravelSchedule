@@ -20,8 +20,9 @@ struct RowView: View {
             
             if showChevron {
                 Spacer()
-                Image("RowImage")
-                    .foregroundColor(.gray)
+                Image(systemName: "chevron.right")
+                    .foregroundColor(.black)
+                    .font(.system(size: 20, weight: .medium))
             }
         }
         .frame(height: 60)

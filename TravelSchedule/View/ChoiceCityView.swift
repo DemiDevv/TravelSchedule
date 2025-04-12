@@ -11,23 +11,47 @@ struct ChoiceCityView: View {
     @Binding var selected: CityStation
     @Environment(\.presentationMode) var presentationMode
     
-    let cities = ["Москва", "Санкт Петербург", "Сочи"]
+    let cities = ["Москва", "Санкт-Петербург", "Сочи"]
     @State private var searchText = ""
+    @State private var isSearching = false
     
     var body: some View {
-        List {
-            ForEach(filteredCities, id: \.self) { city in
-                NavigationLink(destination: ChoiceStationView(city: city, selected: $selected)) {
-                    RowView(title: city)
+        VStack(spacing: 0) {
+            // Кастомная поисковая строка
+            SearchBar(text: $searchText, isSearching: $isSearching)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+                .background(Color.white)
+            
+            // Основное содержимое
+            if filteredCities.isEmpty && !searchText.isEmpty {
+                // Сообщение, если ничего не найдено
+                VStack {
+                    Spacer()
+                    Text("Город не найден")
+                        .font(.system(size: 24))
+                        .bold()
+                        .foregroundColor(.blackYP)
+                    Spacer()
                 }
-                .listRowInsets(EdgeInsets())
-                .listRowSeparator(.hidden)
-                .listRowBackground(Color.white)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(Color.white)
+            } else {
+                // Список городов
+                List {
+                    ForEach(filteredCities, id: \.self) { city in
+                        NavigationLink(destination: ChoiceStationView(city: city, selected: $selected)) {
+                            RowView(title: city)
+                        }
+                        .listRowInsets(EdgeInsets())
+                        .listRowSeparator(.hidden)
+                        .listRowBackground(Color.white)
+                    }
+                }
+                .listStyle(PlainListStyle())
             }
         }
-        .listStyle(PlainListStyle())
         .background(Color.white)
-        .searchable(text: $searchText, prompt: "Введите запрос")
         .navigationTitle("Выбор города")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
@@ -41,6 +65,9 @@ struct ChoiceCityView: View {
                         .font(.system(size: 20, weight: .bold))
                 }
             }
+        }
+        .onChange(of: searchText) { _ in
+            isSearching = !searchText.isEmpty
         }
     }
     
