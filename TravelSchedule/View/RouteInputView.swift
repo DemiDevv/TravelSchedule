@@ -13,6 +13,16 @@ struct RouteInputView: View {
     @State private var isSelectingFrom = false
     @State private var isSelectingTo = false
     
+    // Вычисляемое свойство для проверки, заполнены ли оба поля
+    private var isSearchEnabled: Bool {
+        from.city != "Откуда" && to.city != "Куда"
+    }
+    
+    // Вычисляемое свойство для определения цвета текста
+    private func textColor(for field: CityStation) -> Color {
+        field.city == "Откуда" || field.city == "Куда" ? .gray : .black
+    }
+    
     var body: some View {
         VStack(spacing: 20) {
             Spacer()
@@ -29,7 +39,9 @@ struct RouteInputView: View {
                             isSelectingFrom = true
                         }) {
                             Text(from.displayName)
-                                .foregroundColor(.gray)
+                                .foregroundColor(textColor(for: from))
+                                .lineLimit(1)
+                                .truncationMode(.tail)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         }
                         
@@ -38,7 +50,9 @@ struct RouteInputView: View {
                             isSelectingTo = true
                         }) {
                             Text(to.displayName)
-                                .foregroundColor(.gray)
+                                .foregroundColor(textColor(for: to))
+                                .lineLimit(1)
+                                .truncationMode(.tail)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         }
                     }
@@ -62,16 +76,18 @@ struct RouteInputView: View {
                 }
             }
             
-            // Кнопка "Найти"
-            Button(action: {
-                print("Поиск маршрута от \(from.displayName) до \(to.displayName)")
-            }) {
-                Text("Найти")
-                    .foregroundColor(.white)
-                    .fontWeight(.bold)
-                    .frame(width: 150, height: 60)
-                    .background(Color.blue)
-                    .cornerRadius(16)
+            // Кнопка "Найти" показывается только когда оба поля заполнены
+            if isSearchEnabled {
+                Button(action: {
+                    print("Поиск маршрута от \(from.displayName) до \(to.displayName)")
+                }) {
+                    Text("Найти")
+                        .foregroundColor(.white)
+                        .fontWeight(.bold)
+                        .frame(width: 150, height: 60)
+                        .background(Color.blue)
+                        .cornerRadius(16)
+                }
             }
             
             Spacer()
