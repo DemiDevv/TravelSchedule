@@ -16,62 +16,75 @@ enum SettingsErrorState {
 struct SettingsView: View {
     @Binding var errorState: SettingsErrorState
     @State private var isDarkMode = false
-
+    @State private var showingUserAgreement = false
+    @State private var tabBarIsHidden = false
+    
     var body: some View {
-        VStack(spacing: 0) {
-            if errorState == .none {
-                // Темная тема — Toggle
-                HStack {
-                    Text("Темная тема")
-                        .font(.system(size: 17))
-                        .foregroundColor(.black)
+        NavigationView {
+            VStack(spacing: 0) {
+                if errorState == .none {
+                    // Темная тема — Toggle
+                    HStack {
+                        Text("Темная тема")
+                            .font(.system(size: 17))
+                            .foregroundColor(.black)
+                        Spacer()
+                        Toggle("", isOn: $isDarkMode)
+                            .labelsHidden()
+                            .tint(.blue)
+                    }
+                    .frame(height: 60)
+                    .padding(.horizontal, 16)
+
+                    // Пользовательское соглашение
+                    NavigationLink(
+                        destination: UserAgreementView(tabBarIsHidden: $tabBarIsHidden),
+                        isActive: $showingUserAgreement
+                    ) {
+                        RowView(title: "Пользовательское соглашение")
+                    }
+                    .simultaneousGesture(TapGesture().onEnded {
+                        tabBarIsHidden = true
+                    })
+
                     Spacer()
-                    Toggle("", isOn: $isDarkMode)
-                        .labelsHidden()
-                        .tint(.blue)
+
+                    // Нижняя подпись
+                    VStack(spacing: 16) {
+                        Text("Приложение использует API «Яндекс.Расписания»")
+                            .font(.system(size: 12))
+                            .foregroundColor(.blackYP)
+                            .multilineTextAlignment(.center)
+
+                        Text("Версия 1.0 (beta)")
+                            .font(.system(size: 12))
+                            .foregroundColor(.blackYP)
+                    }
+                    .padding(.bottom, 24)
+                    .padding(.horizontal, 16)
+                } else {
+                    // Ошибки
+                    Spacer()
+                    VStack(spacing: 16) {
+                        Image(errorState == .noInternet ? "no_internet" : "server_error")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 160, height: 160)
+
+                        Text(errorState == .noInternet ? "Нет интернета" : "Ошибка сервера")
+                            .font(.system(size: 24))
+                            .bold()
+                            .foregroundColor(.blackYP)
+                    }
+                    Spacer()
                 }
-                .frame(height: 60)
-                .padding(.horizontal, 16)
-
-                // Пользовательское соглашение
-                RowView(title: "Пользовательское соглашение")
-
-                Spacer()
-
-                // Нижняя подпись
-                VStack(spacing: 16) {
-                    Text("Приложение использует API «Яндекс.Расписания»")
-                        .font(.system(size: 12))
-                        .foregroundColor(.blackYP)
-                        .multilineTextAlignment(.center)
-
-                    Text("Версия 1.0 (beta)")
-                        .font(.system(size: 12))
-                        .foregroundColor(.blackYP)
-                }
-                .padding(.bottom, 24)
-                .padding(.horizontal, 16)
-            } else {
-                // Ошибки: нет интернета или сервер
-                Spacer()
-                VStack(spacing: 16) {
-                    Image(errorState == .noInternet ? "no_internet" : "server_error")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 160, height: 160)
-
-                    Text(errorState == .noInternet ? "Нет интернета" : "Ошибка сервера")
-                        .font(.system(size: 24))
-                        .bold()
-                        .foregroundColor(.blackYP)
-                }
-                Spacer()
             }
+            .background(Color.white)
+            .navigationBarHidden(true)
         }
-        .background(Color.white)
+        .navigationViewStyle(.stack)
     }
 }
-
 //#Preview("No Internet") {
 //    StatefulPreviewWrapper(SettingsErrorState.noInternet) { state in
 //        SettingsViewWrapper(errorState: state)
