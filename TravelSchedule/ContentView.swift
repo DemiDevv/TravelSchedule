@@ -7,35 +7,42 @@
 
 import SwiftUI
 
-import SwiftUI
-
 struct ContentView: View {
     @State private var selectedTab = 0
     @State private var errorState: SettingsErrorState = .none
+    @State private var isActive = true // Состояние для экрана загрузки
 
     var body: some View {
-        NavigationView {
-            TabView(selection: $selectedTab) {
-                
-                // Первая вкладка — маршрут
-                RouteInputView()
-                    .tabItem {
-                        Image("schedule_image")
-                            .renderingMode(.template)
-                            .foregroundColor(selectedTab == 0 ? .black : .gray)
-                    }
-                    .tag(0)
+        ZStack {
+            if isActive {
+                // Экран загрузки
+                SplashScreen(isActive: $isActive)
+            } else {
+                // Основной контент
+                NavigationView {
+                    TabView(selection: $selectedTab) {
+                        
+                        // Первая вкладка — маршрут
+                        RouteInputView()
+                            .tabItem {
+                                Image("schedule_image")
+                                    .renderingMode(.template)
+                                    .foregroundColor(selectedTab == 0 ? .black : .gray)
+                            }
+                            .tag(0)
 
-                // Вторая вкладка — настройки
-                SettingsView(errorState: $errorState)
-                    .tabItem {
-                        Image("settings_image")
-                            .renderingMode(.template)
-                            .foregroundColor(selectedTab == 1 ? .black : .gray)
+                        // Вторая вкладка — настройки
+                        SettingsView(errorState: $errorState)
+                            .tabItem {
+                                Image("settings_image")
+                                    .renderingMode(.template)
+                                    .foregroundColor(selectedTab == 1 ? .black : .gray)
+                            }
+                            .tag(1)
                     }
-                    .tag(1)
+                    .tint(.black) // Устанавливаем основной цвет для активных элементов TabBar
+                }
             }
-            .tint(.black) // Устанавливаем основной цвет для активных элементов TabBar
         }
     }
 }
