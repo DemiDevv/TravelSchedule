@@ -16,8 +16,8 @@ struct ListOfCarriersView: View {
                 Button(action: {
                 }) {
                     Image(systemName: "chevron.left")
-                        .font(.title2)
-                        .padding(.leading)
+                        .foregroundColor(.black)
+                        .font(.system(size: 20, weight: .bold))
                 }
 
                 Spacer()

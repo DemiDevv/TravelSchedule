@@ -13,93 +13,135 @@ enum SettingsErrorState {
     case serverError
 }
 
+import SwiftUI
+
 struct SettingsView: View {
-    @Binding var errorState: SettingsErrorState
-    @State private var isDarkMode = false
-    @State private var showingUserAgreement = false
-    @State private var tabBarIsHidden = false
+    @StateObject private var viewModel = SettingsViewModel()
+    @Binding var externalErrorState: SettingsErrorState
+    
+    init(errorState: Binding<SettingsErrorState>) {
+        self._externalErrorState = errorState
+    }
     
     var body: some View {
         NavigationView {
-            VStack(spacing: 0) {
-                if errorState == .none {
-                    // Темная тема — Toggle
-                    HStack {
-                        Text("Темная тема")
-                            .font(.system(size: 17))
-                            .foregroundColor(.black)
-                        Spacer()
-                        Toggle("", isOn: $isDarkMode)
-                            .labelsHidden()
-                            .tint(.blue)
-                    }
-                    .frame(height: 60)
-                    .padding(.horizontal, 16)
-
-                    // Пользовательское соглашение
-                    NavigationLink(
-                        destination: UserAgreementView(tabBarIsHidden: $tabBarIsHidden),
-                        isActive: $showingUserAgreement
-                    ) {
-                        RowView(title: "Пользовательское соглашение")
-                    }
-                    .simultaneousGesture(TapGesture().onEnded {
-                        tabBarIsHidden = true
-                    })
-
-                    Spacer()
-
-                    // Нижняя подпись
-                    VStack(spacing: 16) {
-                        Text("Приложение использует API «Яндекс.Расписания»")
-                            .font(.system(size: 12))
-                            .foregroundColor(.blackYP)
-                            .multilineTextAlignment(.center)
-
-                        Text("Версия 1.0 (beta)")
-                            .font(.system(size: 12))
-                            .foregroundColor(.blackYP)
-                    }
-                    .padding(.bottom, 24)
-                    .padding(.horizontal, 16)
-                } else {
-                    // Ошибки
-                    Spacer()
-                    VStack(spacing: 16) {
-                        Image(errorState == .noInternet ? "no_internet" : "server_error")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 160, height: 160)
-
-                        Text(errorState == .noInternet ? "Нет интернета" : "Ошибка сервера")
-                            .font(.system(size: 24))
-                            .bold()
-                            .foregroundColor(.blackYP)
-                    }
-                    Spacer()
-                }
-            }
-            .background(Color.white)
-            .navigationBarHidden(true)
+            contentView
+                .background(Color.white)
+                .navigationBarHidden(true)
         }
         .navigationViewStyle(.stack)
+        .onReceive(viewModel.$errorState) { newValue in
+            externalErrorState = newValue
+        }
+    }
+    
+    @ViewBuilder
+    private var contentView: some View {
+        if viewModel.errorState == .none {
+            normalStateView
+        } else {
+            errorStateView
+        }
+    }
+    
+    private var normalStateView: some View {
+        VStack(spacing: 0) {
+            // Настройка темы
+            themeSettingRow
+            
+            // Пользовательское соглашение
+            userAgreementRow
+            
+            Spacer()
+            
+            // Подпись внизу
+            footerInfo
+        }
+    }
+    
+    private var themeSettingRow: some View {
+        HStack {
+            Text("Темная тема")
+                .font(.system(size: 17))
+                .foregroundColor(.black)
+            Spacer()
+            Toggle("", isOn: $viewModel.isDarkMode)
+                .labelsHidden()
+                .tint(.blue)
+                .onChange(of: viewModel.isDarkMode) { _ in
+                    viewModel.toggleDarkMode()
+                }
+        }
+        .frame(height: 60)
+        .padding(.horizontal, 16)
+    }
+    
+    private var userAgreementRow: some View {
+        NavigationLink(
+            destination: UserAgreementView(tabBarIsHidden: $viewModel.tabBarIsHidden),
+            isActive: $viewModel.showingUserAgreement
+        ) {
+            RowView(title: "Пользовательское соглашение")
+        }
+        .simultaneousGesture(TapGesture().onEnded {
+            viewModel.showUserAgreement()
+        })
+    }
+    
+    private var footerInfo: some View {
+        VStack(spacing: 16) {
+            Text("Приложение использует API «Яндекс.Расписания»")
+                .font(.system(size: 12))
+                .foregroundColor(.blackYP)
+                .multilineTextAlignment(.center)
+
+            Text("Версия 1.0 (beta)")
+                .font(.system(size: 12))
+                .foregroundColor(.blackYP)
+        }
+        .padding(.bottom, 24)
+        .padding(.horizontal, 16)
+    }
+    
+    private var errorStateView: some View {
+        VStack(spacing: 16) {
+            Spacer()
+            
+            Image(viewModel.errorImageName())
+                .resizable()
+                .scaledToFit()
+                .frame(width: 160, height: 160)
+
+            Text(viewModel.errorText())
+                .font(.system(size: 24))
+                .bold()
+                .foregroundColor(.blackYP)
+                
+            Spacer()
+        }
     }
 }
-//#Preview("No Internet") {
-//    StatefulPreviewWrapper(SettingsErrorState.noInternet) { state in
-//        SettingsViewWrapper(errorState: state)
-//    }
-//}
 
-//#Preview("Server Error") {
-//    StatefulPreviewWrapper(SettingsErrorState.serverError) { state in
-//        SettingsViewWrapper(errorState: state)
-//    }
-//}
+// MARK: - Previews
 
-#Preview("Normal") {
-    StatefulPreviewWrapper(SettingsErrorState.none) { state in
-        SettingsViewWrapper(errorState: state)
+struct SettingsView_Previews: PreviewProvider {
+    static var previews: some View {
+        Group {
+            StatefulPreviewWrapper(SettingsErrorState.none) { state in
+                SettingsViewWrapper(errorState: state)
+            }
+            .previewDisplayName("Normal State")
+            
+            StatefulPreviewWrapper(SettingsErrorState.noInternet) { state in
+                SettingsViewWrapper(errorState: state)
+            }
+            .previewDisplayName("No Internet")
+            
+            StatefulPreviewWrapper(SettingsErrorState.serverError) { state in
+                SettingsViewWrapper(errorState: state)
+            }
+            .previewDisplayName("Server Error")
+        }
     }
 }
 
@@ -124,4 +166,3 @@ struct StatefulPreviewWrapper<Value, Content: View>: View {
         content($value)
     }
 }
-

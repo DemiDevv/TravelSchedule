@@ -12,26 +12,24 @@ struct ChoiceStationView: View {
     @Binding var selected: CityStation
     @Environment(\.presentationMode) var presentationMode
     @Environment(\.dismiss) var dismiss
+    @StateObject private var viewModel: ChoiceStationViewModel
     
-    let stations = [
-        "Казанский вокзал", "Киевский вокзал", "Курский вокзал",
-        "Ярославский вокзал", "Белорусский вокзал",
-        "Савеловский вокзал", "Ленинградский вокзал"
-    ]
+    init(city: String, selected: Binding<CityStation>) {
+        self.city = city
+        self._selected = selected
+        self._viewModel = StateObject(wrappedValue: ChoiceStationViewModel(city: city))
+    }
     
-    @State private var searchText = ""
-    @State private var isSearching = false
-
     var body: some View {
         VStack(spacing: 0) {
             // Кастомная поисковая строка
-            SearchBar(text: $searchText, isSearching: $isSearching)
+            SearchBar(text: $viewModel.searchText, isSearching: $viewModel.isSearching)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
                 .background(Color.white)
             
             // Основное содержимое
-            if filteredStations.isEmpty && !searchText.isEmpty {
+            if viewModel.filteredStations.isEmpty && !viewModel.searchText.isEmpty {
                 // Сообщение, если ничего не найдено
                 VStack {
                     Spacer()
@@ -45,11 +43,13 @@ struct ChoiceStationView: View {
             } else {
                 // Список станций
                 List {
-                    ForEach(filteredStations, id: \.self) { station in
+                    ForEach(viewModel.filteredStations, id: \.self) { station in
                         Button(action: {
-                            selected = CityStation(city: city, station: station)
-                            dismiss()
-                            presentationMode.wrappedValue.dismiss()
+                            viewModel.selectStation(station) { selection in
+                                selected = selection
+                                dismiss()
+                                presentationMode.wrappedValue.dismiss()
+                            }
                         }) {
                             RowView(title: station)
                         }
@@ -76,13 +76,9 @@ struct ChoiceStationView: View {
                 }
             }
         }
-        .onChange(of: searchText) { _ in
-            isSearching = !searchText.isEmpty
+        .onChange(of: viewModel.searchText) { _ in
+            viewModel.updateSearchingState()
         }
-    }
-
-    var filteredStations: [String] {
-        searchText.isEmpty ? stations : stations.filter { $0.lowercased().contains(searchText.lowercased()) }
     }
 }
 

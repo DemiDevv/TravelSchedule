@@ -10,21 +10,18 @@ import SwiftUI
 struct ChoiceCityView: View {
     @Binding var selected: CityStation
     @Environment(\.presentationMode) var presentationMode
-    
-    let cities = ["Москва", "Санкт-Петербург", "Сочи"]
-    @State private var searchText = ""
-    @State private var isSearching = false
+    @StateObject private var viewModel = ChoiceCityViewModel()
     
     var body: some View {
         VStack(spacing: 0) {
             // Кастомная поисковая строка
-            SearchBar(text: $searchText, isSearching: $isSearching)
+            SearchBar(text: $viewModel.searchText, isSearching: $viewModel.isSearching)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
                 .background(Color.white)
             
             // Основное содержимое
-            if filteredCities.isEmpty && !searchText.isEmpty {
+            if viewModel.filteredCities.isEmpty && !viewModel.searchText.isEmpty {
                 // Сообщение, если ничего не найдено
                 VStack {
                     Spacer()
@@ -39,7 +36,7 @@ struct ChoiceCityView: View {
             } else {
                 // Список городов
                 List {
-                    ForEach(filteredCities, id: \.self) { city in
+                    ForEach(viewModel.filteredCities, id: \.self) { city in
                         NavigationLink(destination: ChoiceStationView(city: city, selected: $selected)) {
                             RowView(title: city)
                         }
@@ -66,13 +63,9 @@ struct ChoiceCityView: View {
                 }
             }
         }
-        .onChange(of: searchText) { _ in
-            isSearching = !searchText.isEmpty
+        .onChange(of: viewModel.searchText) { _ in
+            viewModel.updateSearchingState()
         }
-    }
-    
-    var filteredCities: [String] {
-        searchText.isEmpty ? cities : cities.filter { $0.lowercased().contains(searchText.lowercased()) }
     }
 }
 

@@ -8,112 +8,116 @@
 import SwiftUI
 
 struct RouteInputView: View {
-    @State private var from: CityStation = CityStation(city: "Откуда")
-    @State private var to: CityStation = CityStation(city: "Куда")
-    @State private var isSelectingFrom = false
-    @State private var isSelectingTo = false
-    
-    // Вычисляемое свойство для проверки, заполнены ли оба поля
-    private var isSearchEnabled: Bool {
-        from.city != "Откуда" && to.city != "Куда"
-    }
-    
-    // Вычисляемое свойство для определения цвета текста
-    private func textColor(for field: CityStation) -> Color {
-        field.city == "Откуда" || field.city == "Куда" ? .gray : .black
-    }
+    @StateObject private var viewModel = RouteInputViewModel()
     
     var body: some View {
         VStack(spacing: 20) {
             Spacer()
             
-            ZStack {
-                RoundedRectangle(cornerRadius: 25)
-                    .fill(Color.blue)
-                    .frame(height: 130)
-                
-                HStack(spacing: 0) {
-                    VStack(alignment: .leading, spacing: 20) {
-                        // Откуда
-                        Button(action: {
-                            isSelectingFrom = true
-                        }) {
-                            Text(from.displayName)
-                                .foregroundColor(textColor(for: from))
-                                .lineLimit(1)
-                                .truncationMode(.tail)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                        
-                        // Куда
-                        Button(action: {
-                            isSelectingTo = true
-                        }) {
-                            Text(to.displayName)
-                                .foregroundColor(textColor(for: to))
-                                .lineLimit(1)
-                                .truncationMode(.tail)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                    }
-                    .padding()
-                    .background(Color.white)
-                    .cornerRadius(20)
-                    .padding(.leading, 10)
-                    .padding(.trailing, 10)
-                    
-                    // Иконка смены мест
-                    Button(action: {
-                        swap(&from, &to)
-                    }) {
-                        Image(systemName: "arrow.up.arrow.down")
-                            .foregroundColor(.blue)
-                            .padding(12)
-                            .background(Color.white)
-                            .clipShape(Circle())
-                    }
-                    .padding(.trailing, 10)
-                }
-            }
+            // Блок ввода маршрута
+            routeInputBlock
             
-            // Кнопка "Найти" показывается только когда оба поля заполнены
-            if isSearchEnabled {
-                Button(action: {
-                    print("Поиск маршрута от \(from.displayName) до \(to.displayName)")
-                }) {
-                    Text("Найти")
-                        .foregroundColor(.white)
-                        .fontWeight(.bold)
-                        .frame(width: 150, height: 60)
-                        .background(Color.blue)
-                        .cornerRadius(16)
-                }
+            // Кнопка поиска
+            if viewModel.isSearchEnabled {
+                searchButton
             }
             
             Spacer()
         }
         .padding()
-        .background(
-            Group {
-                NavigationLink(
-                    destination: ChoiceCityView(selected: $from),
-                    isActive: $isSelectingFrom,
-                    label: { EmptyView() }
-                )
-                
-                NavigationLink(
-                    destination: ChoiceCityView(selected: $to),
-                    isActive: $isSelectingTo,
-                    label: { EmptyView() }
-                )
-            }
-        )
+        .background(navigationLinks)
         .navigationBarBackButtonHidden(true)
-        .onChange(of: from) { _ in
-            isSelectingFrom = false
+        .onChange(of: viewModel.from) { _ in
+            viewModel.resetSelection(for: .from)
         }
-        .onChange(of: to) { _ in
-            isSelectingTo = false
+        .onChange(of: viewModel.to) { _ in
+            viewModel.resetSelection(for: .to)
         }
+    }
+    
+    // MARK: - Subviews
+    
+    private var routeInputBlock: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 25)
+                .fill(Color.blue)
+                .frame(height: 130)
+            
+            HStack(spacing: 0) {
+                VStack(alignment: .leading, spacing: 20) {
+                    // Поле "Откуда"
+                    stationButton(
+                        text: viewModel.from.displayName,
+                        textColor: viewModel.textColor(for: viewModel.from),
+                        action: { viewModel.isSelectingFrom = true }
+                    )
+                    
+                    // Поле "Куда"
+                    stationButton(
+                        text: viewModel.to.displayName,
+                        textColor: viewModel.textColor(for: viewModel.to),
+                        action: { viewModel.isSelectingTo = true }
+                    )
+                }
+                .padding()
+                .background(Color.white)
+                .cornerRadius(20)
+                .padding(.leading, 10)
+                .padding(.trailing, 10)
+                
+                // Кнопка смены мест
+                Button(action: viewModel.swapStations) {
+                    Image(systemName: "arrow.up.arrow.down")
+                        .foregroundColor(.blue)
+                        .padding(12)
+                        .background(Color.white)
+                        .clipShape(Circle())
+                }
+                .padding(.trailing, 10)
+            }
+        }
+    }
+    
+    private func stationButton(text: String, textColor: Color, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(text)
+                .foregroundColor(textColor)
+                .lineLimit(1)
+                .truncationMode(.tail)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+    
+    private var searchButton: some View {
+        Button(action: viewModel.performSearch) {
+            Text("Найти")
+                .foregroundColor(.white)
+                .fontWeight(.bold)
+                .frame(width: 150, height: 60)
+                .background(Color.blue)
+                .cornerRadius(16)
+        }
+    }
+    
+    private var navigationLinks: some View {
+        Group {
+            NavigationLink(
+                destination: ChoiceCityView(selected: $viewModel.from),
+                isActive: $viewModel.isSelectingFrom,
+                label: { EmptyView() }
+            )
+            
+            NavigationLink(
+                destination: ChoiceCityView(selected: $viewModel.to),
+                isActive: $viewModel.isSelectingTo,
+                label: { EmptyView() }
+            )
+        }
+    }
+}
+
+struct RouteInputView_Previews: PreviewProvider {
+    static var previews: some View {
+        RouteInputView()
     }
 }
