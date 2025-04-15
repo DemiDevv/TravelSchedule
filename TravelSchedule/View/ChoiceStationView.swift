@@ -8,29 +8,27 @@
 import SwiftUI
 
 struct ChoiceStationView: View {
-    let city: String
-    @Binding var selected: CityStation
+    let city: City
+    @Binding var selectedStation: Station?
+    
     @Environment(\.presentationMode) var presentationMode
     @Environment(\.dismiss) var dismiss
     @StateObject private var viewModel: ChoiceStationViewModel
     
-    init(city: String, selected: Binding<CityStation>) {
+    init(city: City, selectedStation: Binding<Station?>) {
         self.city = city
-        self._selected = selected
+        self._selectedStation = selectedStation
         self._viewModel = StateObject(wrappedValue: ChoiceStationViewModel(city: city))
     }
     
     var body: some View {
         VStack(spacing: 0) {
-            // Кастомная поисковая строка
             SearchBar(text: $viewModel.searchText, isSearching: $viewModel.isSearching)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
                 .background(Color.white)
             
-            // Основное содержимое
             if viewModel.filteredStations.isEmpty && !viewModel.searchText.isEmpty {
-                // Сообщение, если ничего не найдено
                 VStack {
                     Spacer()
                     Text("Станция не найдена")
@@ -41,17 +39,14 @@ struct ChoiceStationView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(Color.white)
             } else {
-                // Список станций
                 List {
-                    ForEach(viewModel.filteredStations, id: \.self) { station in
+                    ForEach(viewModel.filteredStations) { station in
                         Button(action: {
-                            viewModel.selectStation(station) { selection in
-                                selected = selection
-                                dismiss()
-                                presentationMode.wrappedValue.dismiss()
-                            }
+                            selectedStation = station
+                            dismiss()
+                            presentationMode.wrappedValue.dismiss()
                         }) {
-                            RowView(title: station)
+                            RowView(title: station.name)
                         }
                         .listRowInsets(EdgeInsets())
                         .listRowSeparator(.hidden)
@@ -78,16 +73,6 @@ struct ChoiceStationView: View {
         }
         .onChange(of: viewModel.searchText) { _ in
             viewModel.updateSearchingState()
-        }
-    }
-}
-
-struct ChoiceStationView_Previews: PreviewProvider {
-    @State static var selected = CityStation(city: "Москва", station: nil)
-
-    static var previews: some View {
-        NavigationView {
-            ChoiceStationView(city: "Москва", selected: $selected)
         }
     }
 }

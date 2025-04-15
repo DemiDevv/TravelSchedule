@@ -10,38 +10,45 @@ import Combine
 import SwiftUICore
 
 class RouteInputViewModel: ObservableObject {
-    @Published var from: CityStation = CityStation(city: "Откуда")
-    @Published var to: CityStation = CityStation(city: "Куда")
+    @Published var fromCity: City?
+    @Published var fromStation: Station?
+    @Published var toCity: City?
+    @Published var toStation: Station?
+    
     @Published var isSelectingFrom = false
     @Published var isSelectingTo = false
     
     var isSearchEnabled: Bool {
-        from.city != "Откуда" && to.city != "Куда"
+        fromStation != nil && toStation != nil
     }
     
-    func textColor(for field: CityStation) -> Color {
-        field.city == "Откуда" || field.city == "Куда" ? .gray : .black
+    func textForFromField() -> String {
+        if let city = fromCity, let station = fromStation {
+            return "\(city.name) (\(station.name))"
+        }
+        return "Откуда"
+    }
+    
+    func textForToField() -> String {
+        if let city = toCity, let station = toStation {
+            return "\(city.name) (\(station.name))"
+        }
+        return "Куда"
+    }
+    
+    func textColor(for text: String) -> Color {
+        text == "Откуда" || text == "Куда" ? .gray : .black
     }
     
     func swapStations() {
-        swap(&from, &to)
+        swap(&fromCity, &toCity)
+        swap(&fromStation, &toStation)
     }
     
     func performSearch() {
-        print("Поиск маршрута от \(from.displayName) до \(to.displayName)")
-        // Здесь будет логика поиска маршрутов
-    }
-    
-    func resetSelection(for fieldType: FieldType) {
-        switch fieldType {
-        case .from:
-            isSelectingFrom = false
-        case .to:
-            isSelectingTo = false
-        }
-    }
-    
-    enum FieldType {
-        case from, to
+        guard let fromCity = fromCity, let fromStation = fromStation,
+              let toCity = toCity, let toStation = toStation else { return }
+        
+        print("Поиск маршрута от \(fromCity.name) (\(fromStation.name)) до \(toCity.name) (\(toStation.name))")
     }
 }

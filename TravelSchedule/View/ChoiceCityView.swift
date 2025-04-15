@@ -8,21 +8,20 @@
 import SwiftUI
 
 struct ChoiceCityView: View {
-    @Binding var selected: CityStation
+    @Binding var selectedCity: City?
+    @Binding var selectedStation: Station?
+    
     @Environment(\.presentationMode) var presentationMode
     @StateObject private var viewModel = ChoiceCityViewModel()
     
     var body: some View {
         VStack(spacing: 0) {
-            // Кастомная поисковая строка
             SearchBar(text: $viewModel.searchText, isSearching: $viewModel.isSearching)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
                 .background(Color.white)
             
-            // Основное содержимое
             if viewModel.filteredCities.isEmpty && !viewModel.searchText.isEmpty {
-                // Сообщение, если ничего не найдено
                 VStack {
                     Spacer()
                     Text("Город не найден")
@@ -34,11 +33,15 @@ struct ChoiceCityView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(Color.white)
             } else {
-                // Список городов
                 List {
-                    ForEach(viewModel.filteredCities, id: \.self) { city in
-                        NavigationLink(destination: ChoiceStationView(city: city, selected: $selected)) {
-                            RowView(title: city)
+                    ForEach(viewModel.filteredCities) { city in
+                        NavigationLink(
+                            destination: ChoiceStationView(
+                                city: city,
+                                selectedStation: $selectedStation
+                            )
+                        ) {
+                            RowView(title: city.name)
                         }
                         .listRowInsets(EdgeInsets())
                         .listRowSeparator(.hidden)
@@ -66,15 +69,13 @@ struct ChoiceCityView: View {
         .onChange(of: viewModel.searchText) { _ in
             viewModel.updateSearchingState()
         }
-    }
-}
-
-struct ChoiceCityView_Previews: PreviewProvider {
-    @State static var selected = CityStation(city: "Откуда", station: nil)
-
-    static var previews: some View {
-        NavigationView {
-            ChoiceCityView(selected: $selected)
+        .onChange(of: selectedStation) { newValue in
+            if newValue != nil {
+                selectedCity = viewModel.filteredCities.first { $0.stations.contains { $0.id == newValue?.id } }
+                presentationMode.wrappedValue.dismiss()
+            }
         }
     }
 }
+
+
