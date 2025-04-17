@@ -8,11 +8,9 @@
 import SwiftUI
 
 struct UserAgreementView: View {
-    
     @Binding var tabBarIsHidden: Bool
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.colorScheme) var colorScheme
-    @State private var isDarkMode = false
+    @AppStorage(Constants.isDarkMode.stringValue) private var isDarkMode: Bool = false
     
     var body: some View {
         VStack {
@@ -22,30 +20,25 @@ struct UserAgreementView: View {
                     tabBarIsHidden = false
                 }) {
                     Image(systemName: "chevron.left")
-                        .foregroundColor(.blackYP)
+                        .foregroundColor(isDarkMode ? .whiteYP : .blackYP)
                         .font(.system(size: 22))
                         .padding(.leading, 8)
                 }
                 Spacer()
                 Text("Пользовательское соглашение")
                     .font(.headline)
+                    .foregroundColor(isDarkMode ? .whiteYP : .black)
                 Spacer()
             }
             
             NavigationView {
                 WebView(isDarkMode: $isDarkMode)
                     .edgesIgnoringSafeArea(.all)
-                    .background(.whiteYP)
-            }
-            .onAppear {
-                isDarkMode = colorScheme == .dark
-            }
-            .onChange(of: colorScheme) { newScheme in
-                isDarkMode = newScheme == .dark
+                    .background(isDarkMode ? Color.blackYP : Color.whiteYP)
             }
             .navigationBarBackButtonHidden(true)
         }
-        .background(.whiteYP)
+        .background(isDarkMode ? Color.blackYP : Color.whiteYP)
     }
 }
 

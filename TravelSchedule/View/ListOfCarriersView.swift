@@ -8,15 +8,15 @@
 import SwiftUI
 
 struct ListOfCarriersView: View {
-    let trains: [TrainInfo] // это будет приходить с сервера
+    let trains: [TrainInfo]
+    @AppStorage(Constants.isDarkMode.stringValue) private var isDarkMode: Bool = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Button(action: {
-                }) {
+                Button(action: {}) {
                     Image(systemName: "chevron.left")
-                        .foregroundColor(.black)
+                        .foregroundColor(isDarkMode ? .whiteYP : .black)
                         .font(.system(size: 20, weight: .bold))
                 }
 
@@ -25,6 +25,7 @@ struct ListOfCarriersView: View {
 
             Text("Москва (Ярославский вокзал) → Санкт Петербург(Балтийский вокзал)")
                 .font(.system(size: 24, weight: .bold))
+                .foregroundColor(isDarkMode ? .whiteYP : .black)
                 .padding(16)
 
             ScrollView {
@@ -35,8 +36,7 @@ struct ListOfCarriersView: View {
                 }
             }
 
-            Button(action: {
-            }) {
+            Button(action: {}) {
                 Text("Уточнить время")
                     .font(.headline)
                     .foregroundColor(.white)
@@ -48,46 +48,60 @@ struct ListOfCarriersView: View {
             .padding(.horizontal)
             .padding(.top, 8)
         }
+        .background(isDarkMode ? Color.blackYP : Color.white)
     }
 }
 
 #Preview {
-    ListOfCarriersView(trains: [
+    // Создаем календарь для удобного создания дат
+    let calendar = Calendar.current
+    let now = Date()
+    
+    // Функция для создания даты из компонентов
+    func createDate(day: Int, hour: Int, minute: Int) -> Date {
+        var components = calendar.dateComponents([.year, .month], from: now)
+        components.day = day
+        components.hour = hour
+        components.minute = minute
+        return calendar.date(from: components)!
+    }
+    
+    return ListOfCarriersView(trains: [
         TrainInfo(
             companyName: "РЖД",
             companyLogo: Image(systemName: "tram.fill"),
             note: "С пересадкой в Костроме",
-            date: "14 января",
-            departureTime: "22:30",
-            arrivalTime: "08:15",
-            duration: "20 часов"
+            date: createDate(day: 14, hour: 0, minute: 0), // 14 января
+            departureTime: createDate(day: 14, hour: 22, minute: 30),
+            arrivalTime: createDate(day: 15, hour: 8, minute: 15), // прибытие на следующий день
+            duration: 20 * 3600 // 20 часов в секундах
         ),
         TrainInfo(
             companyName: "ФГК",
             companyLogo: Image(systemName: "bolt.car.fill"),
             note: nil,
-            date: "15 января",
-            departureTime: "01:15",
-            arrivalTime: "09:00",
-            duration: "9 часов"
+            date: createDate(day: 15, hour: 0, minute: 0), // 15 января
+            departureTime: createDate(day: 15, hour: 1, minute: 15),
+            arrivalTime: createDate(day: 15, hour: 9, minute: 0),
+            duration: 9 * 3600 // 9 часов в секундах
         ),
         TrainInfo(
             companyName: "Урал логистика",
             companyLogo: Image(systemName: "drop.fill"),
             note: nil,
-            date: "16 января",
-            departureTime: "12:30",
-            arrivalTime: "21:00",
-            duration: "9 часов"
+            date: createDate(day: 16, hour: 0, minute: 0), // 16 января
+            departureTime: createDate(day: 16, hour: 12, minute: 30),
+            arrivalTime: createDate(day: 16, hour: 21, minute: 0),
+            duration: 9 * 3600 // 9 часов в секундах
         ),
         TrainInfo(
             companyName: "РЖД",
             companyLogo: Image(systemName: "tram.fill"),
             note: "С пересадкой в Костроме",
-            date: "17 января",
-            departureTime: "22:30",
-            arrivalTime: "08:15",
-            duration: "20 часов"
+            date: createDate(day: 17, hour: 0, minute: 0), // 17 января
+            departureTime: createDate(day: 17, hour: 22, minute: 30),
+            arrivalTime: createDate(day: 18, hour: 8, minute: 15), // прибытие на следующий день
+            duration: 20 * 3600 // 20 часов в секундах
         )
     ])
 }

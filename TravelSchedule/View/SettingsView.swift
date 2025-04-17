@@ -16,6 +16,7 @@ enum SettingsErrorState {
 import SwiftUI
 
 struct SettingsView: View {
+    @AppStorage(Constants.isDarkMode.stringValue) var isDarkMode: Bool = false
     @StateObject private var viewModel = SettingsViewModel()
     @Binding var externalErrorState: SettingsErrorState
     
@@ -26,7 +27,7 @@ struct SettingsView: View {
     var body: some View {
         NavigationView {
             contentView
-                .background(Color.white)
+                .background(isDarkMode ? .blackYP : .whiteYP)
                 .navigationBarHidden(true)
         }
         .navigationViewStyle(.stack)
@@ -63,17 +64,17 @@ struct SettingsView: View {
         HStack {
             Text("Темная тема")
                 .font(.system(size: 17))
-                .foregroundColor(.black)
+                .foregroundColor(isDarkMode ? .whiteYP : .blackYP)
+            
             Spacer()
-            Toggle("", isOn: $viewModel.isDarkMode)
+            
+            Toggle("", isOn: $isDarkMode)
                 .labelsHidden()
                 .tint(.blue)
-                .onChange(of: viewModel.isDarkMode) { _ in
-                    viewModel.toggleDarkMode()
-                }
         }
         .frame(height: 60)
         .padding(.horizontal, 16)
+        .background(isDarkMode ? .blackYP : .whiteYP)
     }
     
     private var userAgreementRow: some View {
@@ -81,7 +82,19 @@ struct SettingsView: View {
             destination: UserAgreementView(tabBarIsHidden: $viewModel.tabBarIsHidden),
             isActive: $viewModel.showingUserAgreement
         ) {
-            RowView(title: "Пользовательское соглашение")
+            HStack {
+                Text("Пользовательское соглашение")
+                    .font(.system(size: 17))
+                    .foregroundColor(isDarkMode ? .whiteYP : .blackYP)
+                
+                Spacer()
+                
+                Image(systemName: "chevron.right")
+                    .foregroundColor(.gray)
+            }
+            .frame(height: 60)
+            .padding(.horizontal, 16)
+            .background(isDarkMode ? .blackYP : .whiteYP)
         }
         .simultaneousGesture(TapGesture().onEnded {
             viewModel.showUserAgreement()
@@ -92,12 +105,12 @@ struct SettingsView: View {
         VStack(spacing: 16) {
             Text("Приложение использует API «Яндекс.Расписания»")
                 .font(.system(size: 12))
-                .foregroundColor(.blackYP)
+                .foregroundColor(isDarkMode ? .white : .blackYP)
                 .multilineTextAlignment(.center)
 
             Text("Версия 1.0 (beta)")
                 .font(.system(size: 12))
-                .foregroundColor(.blackYP)
+                .foregroundColor(isDarkMode ? .white : .blackYP)
         }
         .padding(.bottom, 24)
         .padding(.horizontal, 16)
@@ -115,10 +128,11 @@ struct SettingsView: View {
             Text(viewModel.errorText())
                 .font(.system(size: 24))
                 .bold()
-                .foregroundColor(.blackYP)
+                .foregroundColor(isDarkMode ? .white : .blackYP)
                 
             Spacer()
         }
+        .background(isDarkMode ? Color.black : Color.white)
     }
 }
 
@@ -129,8 +143,15 @@ struct SettingsView_Previews: PreviewProvider {
         Group {
             StatefulPreviewWrapper(SettingsErrorState.none) { state in
                 SettingsViewWrapper(errorState: state)
+                    .preferredColorScheme(.light)
             }
-            .previewDisplayName("Normal State")
+            .previewDisplayName("Normal State Light")
+            
+            StatefulPreviewWrapper(SettingsErrorState.none) { state in
+                SettingsViewWrapper(errorState: state)
+                    .preferredColorScheme(.dark)
+            }
+            .previewDisplayName("Normal State Dark")
             
             StatefulPreviewWrapper(SettingsErrorState.noInternet) { state in
                 SettingsViewWrapper(errorState: state)

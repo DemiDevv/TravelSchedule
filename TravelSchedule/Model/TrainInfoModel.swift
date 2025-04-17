@@ -12,8 +12,8 @@ struct TrainInfo: Identifiable {
     let companyName: String
     let companyLogo: Image
     let note: String?
-    let date: String
-    let departureTime: String
-    let arrivalTime: String
-    let duration: String
+    let date: Date
+    let departureTime: Date
+    let arrivalTime: Date
+    let duration: TimeInterval
 }

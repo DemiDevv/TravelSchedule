@@ -9,9 +9,14 @@ import SwiftUI
 
 @main
 struct TravelScheduleApp: App {
+    
+    @AppStorage(Constants.isDarkMode.stringValue) private var isDarkMode: Bool = false
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .preferredColorScheme(isDarkMode ? .dark : .light)
+                .animation(.easeOut, value: isDarkMode)
         }
     }
 }

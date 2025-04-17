@@ -14,6 +14,7 @@ struct ChoiceStationView: View {
     @Environment(\.presentationMode) var presentationMode
     @Environment(\.dismiss) var dismiss
     @StateObject private var viewModel: ChoiceStationViewModel
+    @AppStorage(Constants.isDarkMode.stringValue) private var isDarkMode: Bool = false
     
     init(city: City, selectedStation: Binding<Station?>) {
         self.city = city
@@ -26,18 +27,18 @@ struct ChoiceStationView: View {
             SearchBar(text: $viewModel.searchText, isSearching: $viewModel.isSearching)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
-                .background(Color.white)
+                .background(isDarkMode ? Color.blackYP : Color.white)
             
             if viewModel.filteredStations.isEmpty && !viewModel.searchText.isEmpty {
                 VStack {
                     Spacer()
                     Text("Станция не найдена")
                         .font(.system(size: 24))
-                        .foregroundColor(.blackYP)
+                        .foregroundColor(isDarkMode ? .whiteYP : .blackYP)
                     Spacer()
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Color.white)
+                .background(isDarkMode ? Color.blackYP : Color.white)
             } else {
                 List {
                     ForEach(viewModel.filteredStations) { station in
@@ -46,17 +47,17 @@ struct ChoiceStationView: View {
                             dismiss()
                             presentationMode.wrappedValue.dismiss()
                         }) {
-                            RowView(title: station.name)
+                            RowView(title: station.name, isDarkMode: isDarkMode)
                         }
                         .listRowInsets(EdgeInsets())
                         .listRowSeparator(.hidden)
-                        .listRowBackground(Color.white)
+                        .listRowBackground(isDarkMode ? Color.blackYP : Color.white)
                     }
                 }
                 .listStyle(PlainListStyle())
             }
         }
-        .background(Color.white)
+        .background(isDarkMode ? Color.blackYP : Color.white)
         .navigationTitle("Выбор станции")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
@@ -66,7 +67,7 @@ struct ChoiceStationView: View {
                     presentationMode.wrappedValue.dismiss()
                 }) {
                     Image(systemName: "chevron.left")
-                        .foregroundColor(.black)
+                        .foregroundColor(isDarkMode ? .whiteYP : .black)
                         .font(.system(size: 20, weight: .bold))
                 }
             }

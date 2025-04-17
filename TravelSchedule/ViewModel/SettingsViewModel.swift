@@ -10,13 +10,11 @@ import Combine
 
 class SettingsViewModel: ObservableObject {
     @Published var errorState: SettingsErrorState = .none
-    @Published var isDarkMode = false
     @Published var showingUserAgreement = false
     @Published var tabBarIsHidden = false
     
-    func toggleDarkMode() {
+    func toggleDarkMode(isDarkMode: Bool) {
         // Здесь может быть дополнительная логика для смены темы
-        isDarkMode.toggle()
     }
     
     func showUserAgreement() {

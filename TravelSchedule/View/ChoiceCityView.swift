@@ -13,57 +13,82 @@ struct ChoiceCityView: View {
     
     @Environment(\.presentationMode) var presentationMode
     @StateObject private var viewModel = ChoiceCityViewModel()
+    @AppStorage(Constants.isDarkMode.stringValue) private var isDarkMode: Bool = false
+    
+    private var backgroundColor: Color {
+        isDarkMode ? Color.blackYP : Color.white
+    }
+    
+    private var textColor: Color {
+        isDarkMode ? Color.whiteYP : Color.blackYP
+    }
+    
+    private var backButton: some View {
+        Button(action: {
+            presentationMode.wrappedValue.dismiss()
+        }) {
+            Image(systemName: "chevron.left")
+                .foregroundColor(isDarkMode ? .whiteYP : .black)
+                .font(.system(size: 20, weight: .bold))
+        }
+    }
+    
+    private var searchBar: some View {
+        SearchBar(text: $viewModel.searchText, isSearching: $viewModel.isSearching)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
+            .background(backgroundColor)
+    }
+    
+    private var notFoundView: some View {
+        VStack {
+            Spacer()
+            Text("Город не найден")
+                .font(.system(size: 24))
+                .bold()
+                .foregroundColor(textColor)
+            Spacer()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(backgroundColor)
+    }
+    
+    private var cityList: some View {
+        List {
+            ForEach(viewModel.filteredCities) { city in
+                NavigationLink(
+                    destination: ChoiceStationView(
+                        city: city,
+                        selectedStation: $selectedStation
+                    )
+                ) {
+                    RowView(title: city.name, isDarkMode: isDarkMode)
+                }
+                .listRowInsets(EdgeInsets())
+                .listRowSeparator(.hidden)
+                .listRowBackground(backgroundColor)
+            }
+        }
+        .listStyle(PlainListStyle())
+    }
     
     var body: some View {
         VStack(spacing: 0) {
-            SearchBar(text: $viewModel.searchText, isSearching: $viewModel.isSearching)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
-                .background(Color.white)
+            searchBar
             
             if viewModel.filteredCities.isEmpty && !viewModel.searchText.isEmpty {
-                VStack {
-                    Spacer()
-                    Text("Город не найден")
-                        .font(.system(size: 24))
-                        .bold()
-                        .foregroundColor(.blackYP)
-                    Spacer()
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Color.white)
+                notFoundView
             } else {
-                List {
-                    ForEach(viewModel.filteredCities) { city in
-                        NavigationLink(
-                            destination: ChoiceStationView(
-                                city: city,
-                                selectedStation: $selectedStation
-                            )
-                        ) {
-                            RowView(title: city.name)
-                        }
-                        .listRowInsets(EdgeInsets())
-                        .listRowSeparator(.hidden)
-                        .listRowBackground(Color.white)
-                    }
-                }
-                .listStyle(PlainListStyle())
+                cityList
             }
         }
-        .background(Color.white)
+        .background(backgroundColor)
         .navigationTitle("Выбор города")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
-                Button(action: {
-                    presentationMode.wrappedValue.dismiss()
-                }) {
-                    Image(systemName: "chevron.left")
-                        .foregroundColor(.black)
-                        .font(.system(size: 20, weight: .bold))
-                }
+                backButton
             }
         }
         .onChange(of: viewModel.searchText) { _ in
@@ -77,5 +102,3 @@ struct ChoiceCityView: View {
         }
     }
 }
-
-

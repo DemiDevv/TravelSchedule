@@ -15,6 +15,7 @@ struct RouteInputView: View {
     
     @State private var isSelectingFrom = false
     @State private var isSelectingTo = false
+    @AppStorage(Constants.isDarkMode.stringValue) private var isDarkMode: Bool = false
     
     private var isSearchEnabled: Bool {
         fromStation != nil && toStation != nil
@@ -41,7 +42,7 @@ struct RouteInputView: View {
             
             ZStack {
                 RoundedRectangle(cornerRadius: 25)
-                    .fill(Color.blue)
+                    .fill(Color.blueYP)
                     .frame(height: 130)
                 
                 HStack(spacing: 0) {
@@ -78,8 +79,8 @@ struct RouteInputView: View {
                         swap(&fromCity, &toCity)
                         swap(&fromStation, &toStation)
                     }) {
-                        Image(systemName: "arrow.up.arrow.down")
-                            .foregroundColor(.blue)
+                        Image("switch_arrow")
+                            .foregroundColor(.blueYP)
                             .padding(12)
                             .background(Color.white)
                             .clipShape(Circle())
@@ -99,7 +100,7 @@ struct RouteInputView: View {
                         .foregroundColor(.white)
                         .fontWeight(.bold)
                         .frame(width: 150, height: 60)
-                        .background(Color.blue)
+                        .background(Color.blueYP)
                         .cornerRadius(16)
                 }
             }
@@ -107,6 +108,7 @@ struct RouteInputView: View {
             Spacer()
         }
         .padding()
+        .background(isDarkMode ? Color.blackYP : Color.white)
         .background(
             Group {
                 NavigationLink(

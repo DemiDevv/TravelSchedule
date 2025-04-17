@@ -7,7 +7,11 @@
 
 import SwiftUI
 
+
 struct ContentView: View {
+    
+    @AppStorage(Constants.isDarkMode.stringValue) var isDarkMode: Bool = false
+    
     @State private var selectedTab = 0
     @State private var errorState: SettingsErrorState = .none
     @State private var isActive = true // Состояние для экрана загрузки
@@ -44,6 +48,7 @@ struct ContentView: View {
                 }
             }
         }
+        .preferredColorScheme(isDarkMode ? .dark : .light)
     }
 }
 

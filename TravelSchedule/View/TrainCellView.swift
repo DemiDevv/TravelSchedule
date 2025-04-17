@@ -9,11 +9,31 @@ import SwiftUI
 
 struct TrainCellView: View {
     let train: TrainInfo
-
+    @AppStorage(Constants.isDarkMode.stringValue) private var isDarkMode: Bool = false
+    
+    private var dateFormatter: DateFormatter {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "ru_RU")
+        formatter.dateFormat = "d MMMM"
+        return formatter
+    }
+    
+    private var timeFormatter: DateFormatter {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "ru_RU")
+        formatter.dateFormat = "HH:mm"
+        return formatter
+    }
+    
+    private func formatDuration(_ interval: TimeInterval) -> String {
+        let hours = Int(interval.rounded(.toNearestOrAwayFromZero)) / 3600
+        return "\(hours) часов"
+    }
+    
     var body: some View {
         ZStack {
-            Color(.systemGray6)
-
+            isDarkMode ? Color.whiteYP : Color(.systemGray6)
+            
             VStack(spacing: 16) {
                 HStack(alignment: .top) {
                     train.companyLogo
@@ -21,48 +41,52 @@ struct TrainCellView: View {
                         .scaledToFit()
                         .frame(width: 38, height: 38)
                         .padding(.leading, 8)
-
+                        .foregroundColor(isDarkMode ? .blackYP : .primary)
+                    
                     VStack(alignment: .leading, spacing: 4) {
                         HStack {
                             Text(train.companyName)
                                 .font(.system(size: 17))
-
+                                .foregroundColor(isDarkMode ? .blackYP : .primary)
+                            
                             Spacer()
-
-                            Text(train.date)
+                            
+                            Text(dateFormatter.string(from: train.date))
                                 .font(.system(size: 12))
-                                .foregroundColor(.secondary)
+                                .foregroundColor(isDarkMode ? .gray : .secondary)
                         }
-
+                        
                         if let note = train.note {
-                            Text(note)
+                            Text("С пересадкой в \(note)")
                                 .font(.system(size: 12))
                                 .foregroundColor(.redYP)
                         }
                     }
                     .padding(.trailing, 8)
                 }
-
+                
                 HStack {
-                    Text(train.departureTime)
+                    Text(timeFormatter.string(from: train.departureTime))
                         .font(.system(size: 17))
-
+                        .foregroundColor(isDarkMode ? .blackYP : .primary)
+                    
                     Rectangle()
-                        .fill(Color.gray.opacity(0.5))
+                        .fill(isDarkMode ? Color.gray : Color.gray.opacity(0.5))
                         .frame(height: 1)
                         .padding(.horizontal, 4)
-
-                    Text(train.duration)
+                    
+                    Text(formatDuration(train.duration))
                         .font(.system(size: 12))
-                        .foregroundColor(.secondary)
-
+                        .foregroundColor(isDarkMode ? .gray : .secondary)
+                    
                     Rectangle()
-                        .fill(Color.gray.opacity(0.5))
+                        .fill(isDarkMode ? Color.gray : Color.gray.opacity(0.5))
                         .frame(height: 1)
                         .padding(.horizontal, 4)
-
-                    Text(train.arrivalTime)
+                    
+                    Text(timeFormatter.string(from: train.arrivalTime))
                         .font(.system(size: 17))
+                        .foregroundColor(isDarkMode ? .blackYP : .primary)
                 }
                 .padding(.horizontal, 8)
             }
@@ -75,13 +99,22 @@ struct TrainCellView: View {
 }
 
 #Preview {
-    TrainCellView(train: TrainInfo(
+    let sampleTrain = TrainInfo(
         companyName: "РЖД",
-        companyLogo: Image(systemName: "tram.fill"),
-        note: "С пересадкой в Костроме",
-        date: "14 января",
-        departureTime: "22:30",
-        arrivalTime: "08:15",
-        duration: "25 часов"
-    ))
+        companyLogo: Image(systemName: "train.side.front.car"),
+        note: "Костроме",
+        date: Date(),
+        departureTime: Date(),
+        arrivalTime: Date().addingTimeInterval(3600 * 5 + 60 * 30), // 5 часов 30 минут
+        duration: 3600 * 5 + 60 * 30
+    )
+    
+    return Group {
+        TrainCellView(train: sampleTrain)
+            .previewDisplayName("Light Mode")
+        
+        TrainCellView(train: sampleTrain)
+            .preferredColorScheme(.dark)
+            .previewDisplayName("Dark Mode")
+    }
 }

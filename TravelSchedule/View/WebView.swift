@@ -10,7 +10,6 @@ import WebKit
 
 struct WebView: UIViewRepresentable {
     @Binding var isDarkMode: Bool
-    @State private var blackBGColor: String = "1A1B22"
     
     func makeUIView(context: Context) -> WKWebView {
         let webView = WKWebView()
@@ -47,11 +46,11 @@ struct WebView: UIViewRepresentable {
             let darkMode = \(isDarkMode ? "true" : "false");
             
             if (darkMode) {
-                document.documentElement.style.filter = "invert(1) hue-rotate(180deg)";
-                document.querySelectorAll("img, video").forEach(el => el.style.filter = "invert(1) hue-rotate(180deg)");
+                document.body.style.backgroundColor = '#1A1B22';
+                document.body.style.color = '#FFFFFF';
             } else {
-                document.documentElement.style.filter = "";
-                document.querySelectorAll("img, video").forEach(el => el.style.filter = "");
+                document.body.style.backgroundColor = '#FFFFFF';
+                document.body.style.color = '#000000';
             }
         })();
         """
@@ -59,6 +58,3 @@ struct WebView: UIViewRepresentable {
         webView.evaluateJavaScript(js, completionHandler: nil)
     }
 }
-
-
-
