@@ -5,6 +5,7 @@
 //  Created by Demain Petropavlov on 08.04.2025.
 //
 
+
 import SwiftUI
 
 struct ChoiceStationView: View {
@@ -15,6 +16,24 @@ struct ChoiceStationView: View {
     @Environment(\.dismiss) var dismiss
     @StateObject private var viewModel: ChoiceStationViewModel
     @AppStorage(Constants.isDarkMode.stringValue) private var isDarkMode: Bool = false
+    
+    private var backgroundColor: Color {
+        isDarkMode ? Color.blackYP : Color.white
+    }
+    
+    private var textColor: Color {
+        isDarkMode ? .whiteYP : .blackYP
+    }
+    
+    private var backButton: some View {
+        Button(action: {
+            presentationMode.wrappedValue.dismiss()
+        }) {
+            Image(systemName: "chevron.left")
+                .foregroundColor(isDarkMode ? .whiteYP : .black)
+                .font(.system(size: 22, weight: .medium))
+        }
+    }
     
     init(city: City, selectedStation: Binding<Station?>) {
         self.city = city
@@ -27,18 +46,22 @@ struct ChoiceStationView: View {
             SearchBar(text: $viewModel.searchText, isSearching: $viewModel.isSearching)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
-                .background(isDarkMode ? Color.blackYP : Color.white)
+                .background(backgroundColor)
             
-            if viewModel.filteredStations.isEmpty && !viewModel.searchText.isEmpty {
-                VStack {
-                    Spacer()
-                    Text("Станция не найдена")
-                        .font(.system(size: 24))
-                        .foregroundColor(isDarkMode ? .whiteYP : .blackYP)
-                    Spacer()
+            if viewModel.filteredStations.isEmpty {
+                if viewModel.searchText.isEmpty {
+                    ErrorView(errors: .serverError)
+                } else {
+                    VStack {
+                        Spacer()
+                        Text("Станция не найдена")
+                            .font(.system(size: 24))
+                            .foregroundColor(textColor)
+                        Spacer()
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(backgroundColor)
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(isDarkMode ? Color.blackYP : Color.white)
             } else {
                 List {
                     ForEach(viewModel.filteredStations) { station in
@@ -51,25 +74,22 @@ struct ChoiceStationView: View {
                         }
                         .listRowInsets(EdgeInsets())
                         .listRowSeparator(.hidden)
-                        .listRowBackground(isDarkMode ? Color.blackYP : Color.white)
+                        .listRowBackground(backgroundColor)
                     }
                 }
                 .listStyle(PlainListStyle())
             }
         }
-        .background(isDarkMode ? Color.blackYP : Color.white)
-        .navigationTitle("Выбор станции")
-        .navigationBarTitleDisplayMode(.inline)
+        .background(backgroundColor)
         .navigationBarBackButtonHidden(true)
         .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text("Выбор станции")
+                    .foregroundColor(textColor)
+                    .font(.headline)
+            }
             ToolbarItem(placement: .navigationBarLeading) {
-                Button(action: {
-                    presentationMode.wrappedValue.dismiss()
-                }) {
-                    Image(systemName: "chevron.left")
-                        .foregroundColor(isDarkMode ? .whiteYP : .black)
-                        .font(.system(size: 20, weight: .bold))
-                }
+                backButton
             }
         }
         .onChange(of: viewModel.searchText) { _ in

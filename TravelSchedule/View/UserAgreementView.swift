@@ -13,32 +13,42 @@ struct UserAgreementView: View {
     @AppStorage(Constants.isDarkMode.stringValue) private var isDarkMode: Bool = false
     
     var body: some View {
-        VStack {
-            HStack {
-                Button(action: {
-                    dismiss()
-                    tabBarIsHidden = false
-                }) {
-                    Image(systemName: "chevron.left")
-                        .foregroundColor(isDarkMode ? .whiteYP : .blackYP)
-                        .font(.system(size: 22))
-                        .padding(.leading, 8)
-                }
-                Spacer()
-                Text("Пользовательское соглашение")
-                    .font(.headline)
-                    .foregroundColor(isDarkMode ? .whiteYP : .black)
-                Spacer()
-            }
+        ZStack {
+            // Фоновый цвет на весь экран
+            (isDarkMode ? Color.blackYP : Color.whiteYP)
+                .edgesIgnoringSafeArea(.all)
             
-            NavigationView {
+            VStack(spacing: 0) {
+                // Хедер с кнопкой назад
+                HStack {
+                    Button(action: {
+                        dismiss()
+                        tabBarIsHidden = false
+                    }) {
+                        Image(systemName: "chevron.left")
+                            .foregroundColor(isDarkMode ? .whiteYP : .blackYP)
+                            .font(.system(size: 22))
+                            .padding(.leading, 8)
+                    }
+                    Spacer()
+                    Text("Пользовательское соглашение")
+                        .font(.headline)
+                        .foregroundColor(isDarkMode ? .whiteYP : .black)
+                    Spacer()
+                }
+                .padding(.top, 16)
+                .padding(.bottom, 8)
+                
+                // WebView
                 WebView(isDarkMode: $isDarkMode)
                     .edgesIgnoringSafeArea(.all)
-                    .background(isDarkMode ? Color.blackYP : Color.whiteYP)
             }
-            .navigationBarBackButtonHidden(true)
         }
-        .background(isDarkMode ? Color.blackYP : Color.whiteYP)
+        .navigationBarBackButtonHidden(true)
+        .navigationBarHidden(true)
+        .onAppear {
+            tabBarIsHidden = true
+        }
     }
 }
 

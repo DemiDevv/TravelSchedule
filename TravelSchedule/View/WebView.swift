@@ -5,6 +5,13 @@
 //  Created by Demain Petropavlov on 12.04.2025.
 //
 
+//
+//  WebView.swift
+//  TravelSchedule
+//
+//  Created by Demain Petropavlov on 12.04.2025.
+//
+
 import SwiftUI
 import WebKit
 
@@ -14,6 +21,10 @@ struct WebView: UIViewRepresentable {
     func makeUIView(context: Context) -> WKWebView {
         let webView = WKWebView()
         webView.navigationDelegate = context.coordinator
+        webView.isOpaque = false
+        webView.backgroundColor = .clear
+        webView.scrollView.backgroundColor = .clear
+        
         let url = URL(string: "https://www.yandex.ru/legal/practicum_offer/")!
         let request = URLRequest(url: url)
         webView.load(request)
@@ -41,16 +52,18 @@ struct WebView: UIViewRepresentable {
     }
     
     private func updateTheme(for webView: WKWebView) {
+        let backgroundColor = isDarkMode ? "#1A1B22" : "#FFFFFF"
+        let textColor = isDarkMode ? "#FFFFFF" : "#000000"
+        
         let js = """
         (function() {
-            let darkMode = \(isDarkMode ? "true" : "false");
+            document.body.style.backgroundColor = '\(backgroundColor)';
+            document.body.style.color = '\(textColor)';
             
-            if (darkMode) {
-                document.body.style.backgroundColor = '#1A1B22';
-                document.body.style.color = '#FFFFFF';
-            } else {
-                document.body.style.backgroundColor = '#FFFFFF';
-                document.body.style.color = '#000000';
+            let elements = document.querySelectorAll('div, p, span, a, h1, h2, h3, h4, h5, h6');
+            for (let i = 0; i < elements.length; i++) {
+                elements[i].style.backgroundColor = '\(backgroundColor)';
+                elements[i].style.color = '\(textColor)';
             }
         })();
         """

@@ -20,7 +20,7 @@ struct ChoiceCityView: View {
     }
     
     private var textColor: Color {
-        isDarkMode ? Color.whiteYP : Color.blackYP
+        isDarkMode ? .whiteYP : .blackYP
     }
     
     private var backButton: some View {
@@ -29,7 +29,7 @@ struct ChoiceCityView: View {
         }) {
             Image(systemName: "chevron.left")
                 .foregroundColor(isDarkMode ? .whiteYP : .black)
-                .font(.system(size: 20, weight: .bold))
+                .font(.system(size: 22, weight: .medium))
         }
     }
     
@@ -63,6 +63,7 @@ struct ChoiceCityView: View {
                     )
                 ) {
                     RowView(title: city.name, isDarkMode: isDarkMode)
+                        .buttonStyle(PlainButtonStyle())
                 }
                 .listRowInsets(EdgeInsets())
                 .listRowSeparator(.hidden)
@@ -76,17 +77,26 @@ struct ChoiceCityView: View {
         VStack(spacing: 0) {
             searchBar
             
-            if viewModel.filteredCities.isEmpty && !viewModel.searchText.isEmpty {
-                notFoundView
+            if viewModel.filteredCities.isEmpty {
+                if viewModel.searchText.isEmpty {
+                    ErrorView(errors: .noInternet)
+                } else {
+                    notFoundView
+                }
             } else {
                 cityList
             }
+
         }
         .background(backgroundColor)
-        .navigationTitle("Выбор города")
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarTitle("Выбор города", displayMode: .inline)
         .navigationBarBackButtonHidden(true)
         .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text("Выбор города")
+                    .foregroundColor(isDarkMode ? .whiteYP : .blackYP)
+                    .font(.headline)
+            }
             ToolbarItem(placement: .navigationBarLeading) {
                 backButton
             }

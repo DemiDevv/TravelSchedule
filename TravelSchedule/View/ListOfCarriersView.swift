@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+import SwiftUI
+
 struct ListOfCarriersView: View {
     let trains: [TrainInfo]
     @AppStorage(Constants.isDarkMode.stringValue) private var isDarkMode: Bool = false
@@ -17,8 +19,9 @@ struct ListOfCarriersView: View {
                 Button(action: {}) {
                     Image(systemName: "chevron.left")
                         .foregroundColor(isDarkMode ? .whiteYP : .black)
-                        .font(.system(size: 20, weight: .bold))
+                        .font(.system(size: 22, weight: .medium))
                 }
+                .padding(.leading, 8)
 
                 Spacer()
             }
@@ -70,7 +73,7 @@ struct ListOfCarriersView: View {
         TrainInfo(
             companyName: "РЖД",
             companyLogo: Image(systemName: "tram.fill"),
-            note: "С пересадкой в Костроме",
+            note: "Костроме",
             date: createDate(day: 14, hour: 0, minute: 0), // 14 января
             departureTime: createDate(day: 14, hour: 22, minute: 30),
             arrivalTime: createDate(day: 15, hour: 8, minute: 15), // прибытие на следующий день
@@ -97,7 +100,7 @@ struct ListOfCarriersView: View {
         TrainInfo(
             companyName: "РЖД",
             companyLogo: Image(systemName: "tram.fill"),
-            note: "С пересадкой в Костроме",
+            note: "Волгограде",
             date: createDate(day: 17, hour: 0, minute: 0), // 17 января
             departureTime: createDate(day: 17, hour: 22, minute: 30),
             arrivalTime: createDate(day: 18, hour: 8, minute: 15), // прибытие на следующий день
