@@ -8,42 +8,47 @@
 import SwiftUI
 
 struct ContentView: View {
-    @AppStorage("isDarkMode") var isDarkMode: Bool = false
+    @AppStorage(Constants.isDarkMode.stringValue) var isDarkMode: Bool = false
     @StateObject private var networkMonitor = NetworkMonitor()
-    @StateObject private var navigationModel = NavigationModel()
     
     @State private var selectedTab = 0
     @State private var errorState: AppError? = nil
-    @State private var isActive = true
+    @State private var isActive = true // Состояние для экрана загрузки
 
     var body: some View {
         ZStack {
             if isActive {
+                // Экран загрузки
                 SplashScreen(isActive: $isActive)
             } else {
+                // Основной контент или экран ошибки
                 if networkMonitor.isConnected {
-                    NavigationStack(path: $navigationModel.path) {
+                    NavigationView {
                         ZStack(alignment: .bottom) {
                             TabView(selection: $selectedTab) {
+                                // Первая вкладка — маршрут
                                 RouteInputView()
                                     .tabItem {
                                         Image("schedule_image")
                                             .renderingMode(.template)
-                                            .foregroundColor(selectedTab == 0 ? (isDarkMode ? .white : .black) : .gray)
+                                            .foregroundColor(selectedTab == 0 ? (isDarkMode ? .white : .blackYP) : .grayYP)
                                     }
                                     .tag(0)
 
+                                // Вторая вкладка — настройки
                                 SettingsView(errorState: $errorState)
                                     .tabItem {
                                         Image("settings_image")
                                             .renderingMode(.template)
-                                            .foregroundColor(selectedTab == 1 ? (isDarkMode ? .white : .black) : .gray)
+                                            .foregroundColor(selectedTab == 1 ? (isDarkMode ? .white : .blackYP) : .grayYP)
                                     }
                                     .tag(1)
                             }
-                            .tint(isDarkMode ? .white : .black)
-                            .navigationDestination(for: Screen.self) { screen in
-                                Route.destination(screen, from: .constant(""), toIn: .constant(""))
+                            .tint(isDarkMode ? .white : .blackYP)
+                            .onChange(of: errorState) { newValue in
+                                if newValue != nil {
+                                    print("Произошла ошибка: \(newValue!)")
+                                }
                             }
 
                             VStack {
@@ -56,8 +61,8 @@ struct ContentView: View {
                             .allowsHitTesting(false)
                         }
                     }
-                    .environmentObject(navigationModel)
                 } else {
+                    // Показываем экран ошибки при отсутствии интернета
                     ErrorView(errors: AppError.noInternet)
                         .transition(.opacity)
                 }
