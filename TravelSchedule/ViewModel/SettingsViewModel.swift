@@ -8,7 +8,7 @@
 import Foundation
 import Combine
 
-class SettingsViewModel: ObservableObject {
+final class SettingsViewModel: ObservableObject {
     @Published var errorState: AppError? = nil
     @Published var showingUserAgreement = false
     @Published var tabBarIsHidden = false

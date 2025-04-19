@@ -9,7 +9,7 @@ import Foundation
 import Combine
 import SwiftUICore
 
-class RouteInputViewModel: ObservableObject {
+final class RouteInputViewModel: ObservableObject {
     @Published var fromCity: City?
     @Published var fromStation: Station?
     @Published var toCity: City?

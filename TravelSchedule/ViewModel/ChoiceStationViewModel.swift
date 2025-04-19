@@ -8,7 +8,7 @@
 import Foundation
 import Combine
 
-class ChoiceStationViewModel: ObservableObject {
+final class ChoiceStationViewModel: ObservableObject {
     let city: City
     @Published var searchText = ""
     @Published var isSearching = false
