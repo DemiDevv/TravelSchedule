@@ -10,10 +10,10 @@ import SwiftUI
 
 struct ChoiceStationView: View {
     let city: City
+    let isFromField: Bool
     @Binding var selectedStation: Station?
+    @Binding var navigationPath: NavigationPath
     
-    @Environment(\.presentationMode) var presentationMode
-    @Environment(\.dismiss) var dismiss
     @StateObject private var viewModel: ChoiceStationViewModel
     @AppStorage(Constants.isDarkMode.stringValue) private var isDarkMode: Bool = false
     
@@ -27,7 +27,7 @@ struct ChoiceStationView: View {
     
     private var backButton: some View {
         Button(action: {
-            presentationMode.wrappedValue.dismiss()
+            navigationPath.removeLast()
         }) {
             Image(systemName: "chevron.left")
                 .foregroundColor(isDarkMode ? .whiteYP : .black)
@@ -35,9 +35,11 @@ struct ChoiceStationView: View {
         }
     }
     
-    init(city: City, selectedStation: Binding<Station?>) {
+    init(city: City, isFromField: Bool, selectedStation: Binding<Station?>, navigationPath: Binding<NavigationPath>) {
         self.city = city
+        self.isFromField = isFromField
         self._selectedStation = selectedStation
+        self._navigationPath = navigationPath
         self._viewModel = StateObject(wrappedValue: ChoiceStationViewModel(city: city))
     }
     
@@ -67,8 +69,7 @@ struct ChoiceStationView: View {
                     ForEach(viewModel.filteredStations) { station in
                         Button(action: {
                             selectedStation = station
-                            dismiss()
-                            presentationMode.wrappedValue.dismiss()
+                            navigationPath.removeLast(navigationPath.count)
                         }) {
                             RowView(title: station.name, isDarkMode: isDarkMode)
                         }
@@ -81,6 +82,8 @@ struct ChoiceStationView: View {
             }
         }
         .background(backgroundColor)
+        .navigationTitle("Выбор станции")
+        .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .principal) {
@@ -92,8 +95,6 @@ struct ChoiceStationView: View {
                 backButton
             }
         }
-        .onChange(of: viewModel.searchText) { _ in
-            viewModel.updateSearchingState()
-        }
+        .ignoresSafeArea(edges: .bottom)
     }
 }

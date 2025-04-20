@@ -8,10 +8,11 @@
 import SwiftUI
 
 struct ChoiceCityView: View {
+    let isFromField: Bool
     @Binding var selectedCity: City?
     @Binding var selectedStation: Station?
+    @Binding var navigationPath: NavigationPath
     
-    @Environment(\.presentationMode) var presentationMode
     @StateObject private var viewModel = ChoiceCityViewModel()
     @AppStorage(Constants.isDarkMode.stringValue) private var isDarkMode: Bool = false
     
@@ -25,7 +26,7 @@ struct ChoiceCityView: View {
     
     private var backButton: some View {
         Button(action: {
-            presentationMode.wrappedValue.dismiss()
+            navigationPath.removeLast()
         }) {
             Image(systemName: "chevron.left")
                 .foregroundColor(isDarkMode ? .whiteYP : .black)
@@ -56,15 +57,14 @@ struct ChoiceCityView: View {
     private var cityList: some View {
         List {
             ForEach(viewModel.filteredCities) { city in
-                NavigationLink(
-                    destination: ChoiceStationView(
-                        city: city,
-                        selectedStation: $selectedStation
-                    )
-                ) {
+                Button(action: {
+                    selectedCity = city
+                    selectedStation = nil
+                    navigationPath.append(Destination.choiceStation(city: city, isFromField: isFromField))
+                }) {
                     RowView(title: city.name, isDarkMode: isDarkMode)
-                        .buttonStyle(PlainButtonStyle())
                 }
+                .buttonStyle(PlainButtonStyle())
                 .listRowInsets(EdgeInsets())
                 .listRowSeparator(.hidden)
                 .listRowBackground(backgroundColor)
@@ -86,29 +86,21 @@ struct ChoiceCityView: View {
             } else {
                 cityList
             }
-
         }
         .background(backgroundColor)
-        .navigationBarTitle("Выбор города", displayMode: .inline)
+        .navigationTitle("Выбор города")
+        .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .principal) {
                 Text("Выбор города")
-                    .foregroundColor(isDarkMode ? .whiteYP : .blackYP)
+                    .foregroundColor(textColor)
                     .font(.headline)
             }
             ToolbarItem(placement: .navigationBarLeading) {
                 backButton
             }
         }
-        .onChange(of: viewModel.searchText) { _ in
-            viewModel.updateSearchingState()
-        }
-        .onChange(of: selectedStation) { newValue in
-            if newValue != nil {
-                selectedCity = viewModel.filteredCities.first { $0.stations.contains { $0.id == newValue?.id } }
-                presentationMode.wrappedValue.dismiss()
-            }
-        }
+        .ignoresSafeArea(edges: .bottom)
     }
 }

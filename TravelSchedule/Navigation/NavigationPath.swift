@@ -7,39 +7,30 @@
 
 import SwiftUI
 
-enum Screen: Hashable {
-    case city(Bool)
-    case station(String, [Station], Bool)
-    case toRoot
+enum Destination: Hashable {
+    case choiceCity(fromField: Bool)
+    case choiceStation(city: City, isFromField: Bool)
+    
+    static func == (lhs: Destination, rhs: Destination) -> Bool {
+        switch (lhs, rhs) {
+        case (.choiceCity(let lhsFrom), .choiceCity(let rhsFrom)):
+            return lhsFrom == rhsFrom
+        case (.choiceStation(let lhsCity, let lhsFrom), .choiceStation(let rhsCity, let rhsFrom)):
+            return lhsCity.id == rhsCity.id && lhsFrom == rhsFrom
+        default:
+            return false
+        }
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        switch self {
+        case .choiceCity(let fromField):
+            hasher.combine("choiceCity")
+            hasher.combine(fromField)
+        case .choiceStation(let city, let fromField):
+            hasher.combine("choiceStation")
+            hasher.combine(city.id)
+            hasher.combine(fromField)
+        }
+    }
 }
-
-final class NavigationModel: ObservableObject {
-    
-    @Published var path = NavigationPath()
-    
-    func push(_ screen: Screen) {
-        path.append(screen)
-    }
-    
-    func pop() {
-        path.removeLast()
-    }
-    
-    func popRoot() {
-        path = NavigationPath()
-    }
-}
-
-//struct Route {
-//    @ViewBuilder
-//    static func destination(_ screen: Screen, from: Binding<String>, toIn: Binding<String>) -> some View {
-//        switch screen {
-//        case .city(let isFrom):
-//            ChoiceCityView(data: ModelData.cities, selectedCity: isFrom ? from : toIn, isFrom: isFrom)
-//        case .station(let city, let stations, let isFrom):
-//            ChoiceStationView(city: city, stations: stations, selectedStation: isFrom ? from : toIn, isFrom: isFrom)
-//        case .toRoot:
-//            EmptyView()
-//        }
-//    }
-//}
