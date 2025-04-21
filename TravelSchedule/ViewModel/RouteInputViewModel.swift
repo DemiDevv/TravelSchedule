@@ -7,7 +7,7 @@
 
 import Foundation
 import Combine
-import SwiftUICore
+import SwiftUI
 
 final class RouteInputViewModel: ObservableObject {
     @Published var fromCity: City?
@@ -15,40 +15,42 @@ final class RouteInputViewModel: ObservableObject {
     @Published var toCity: City?
     @Published var toStation: Station?
     
-    @Published var isSelectingFrom = false
-    @Published var isSelectingTo = false
-    
     var isSearchEnabled: Bool {
         fromStation != nil && toStation != nil
     }
     
-    func textForFromField() -> String {
-        if let city = fromCity, let station = fromStation {
+    func displayText(isFromField: Bool) -> String {
+        let city = isFromField ? fromCity : toCity
+        let station = isFromField ? fromStation : toStation
+        
+        if let city = city, let station = station {
             return "\(city.name) (\(station.name))"
+        } else if let city = city {
+            return city.name
         }
-        return "Откуда"
+        return isFromField ? "Откуда" : "Куда"
     }
     
-    func textForToField() -> String {
-        if let city = toCity, let station = toStation {
-            return "\(city.name) (\(station.name))"
-        }
-        return "Куда"
-    }
-    
-    func textColor(for text: String) -> Color {
-        text == "Откуда" || text == "Куда" ? .gray : .black
+    func textColor(for text: String, isDarkMode: Bool) -> Color {
+        (text == "Откуда" || text == "Куда") ? .gray : (isDarkMode ? .whiteYP : .blackYP)
     }
     
     func swapStations() {
-        swap(&fromCity, &toCity)
-        swap(&fromStation, &toStation)
+        withAnimation {
+            swap(&fromCity, &toCity)
+            swap(&fromStation, &toStation)
+        }
     }
     
     func performSearch() {
-        guard let fromCity = fromCity, let fromStation = fromStation,
-              let toCity = toCity, let toStation = toStation else { return }
+        guard let fromCity = fromCity,
+              let fromStation = fromStation,
+              let toCity = toCity,
+              let toStation = toStation else { return }
         
-        print("Поиск маршрута от \(fromCity.name) (\(fromStation.name)) до \(toCity.name) (\(toStation.name))")
+        print("""
+        Откуда: \(fromCity.name) (\(fromStation.name))
+        Куда: \(toCity.name) (\(toStation.name))
+        """)
     }
 }

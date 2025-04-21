@@ -104,3 +104,13 @@ struct ChoiceCityView: View {
         .ignoresSafeArea(edges: .bottom)
     }
 }
+
+// MARK: - Preview
+#Preview {
+    ChoiceCityView(
+        isFromField: false,
+        selectedCity: .constant(nil),
+        selectedStation: .constant(nil),
+        navigationPath: .constant(NavigationPath())
+    )
+}

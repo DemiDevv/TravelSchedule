@@ -33,3 +33,7 @@ struct RowView: View {
     }
 }
 
+// MARK: - Preview
+#Preview {
+    RowView(title: "Москва", isDarkMode: false, showChevron: true)
+}

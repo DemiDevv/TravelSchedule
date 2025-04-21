@@ -98,3 +98,38 @@ struct ChoiceStationView: View {
         .ignoresSafeArea(edges: .bottom)
     }
 }
+
+// MARK: - Preview
+struct ChoiceStationView_Previews: PreviewProvider {
+    static let testCity = City(
+        name: "Москва",
+        stations: [
+            Station(name: "Курский вокзал"),
+            Station(name: "Ленинградский вокзал"),
+            Station(name: "Ярославский вокзал")
+        ]
+    )
+    
+    struct PreviewWrapper: View {
+        let city: City
+        @State private var selectedStation: Station? = nil
+        @State private var navigationPath = NavigationPath()
+        
+        var body: some View {
+            ChoiceStationView(
+                city: city,
+                isFromField: true,
+                selectedStation: $selectedStation,
+                navigationPath: $navigationPath
+            )
+        }
+    }
+    static var previews: some View {
+            ChoiceStationView(
+                city: testCity,
+                isFromField: false,
+                selectedStation: .constant(nil),
+                navigationPath: .constant(NavigationPath())
+            )
+    }
+}

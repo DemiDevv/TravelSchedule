@@ -7,39 +7,55 @@
 
 import SwiftUI
 
-import SwiftUI
-
 struct ListOfCarriersView: View {
     let trains: [TrainInfo]
     @AppStorage(Constants.isDarkMode.stringValue) private var isDarkMode: Bool = false
-
+    @State private var showingDepartureTimeView = false
+    
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Button(action: {}) {
-                    Image(systemName: "chevron.left")
-                        .foregroundColor(isDarkMode ? .whiteYP : .black)
-                        .font(.system(size: 22, weight: .medium))
+        NavigationStack {
+            contentView
+                .navigationDestination(isPresented: $showingDepartureTimeView) {
+                    DepartureTimeView()
+                        .navigationBarBackButtonHidden(true) // Скрываем стандартную кнопку назад
                 }
-                .padding(.leading, 8)
-
-                Spacer()
-            }
-
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Button(action: {}) {
+                            Image(systemName: "chevron.left")
+                                .foregroundColor(isDarkMode ? .white : .black)
+                                .font(.system(size: 22, weight: .medium))
+                        }
+                    }
+                }
+        }
+    }
+    
+    private var contentView: some View {
+        VStack(alignment: .leading, spacing: 12) {
             Text("Москва (Ярославский вокзал) → Санкт Петербург(Балтийский вокзал)")
                 .font(.system(size: 24, weight: .bold))
                 .foregroundColor(isDarkMode ? .whiteYP : .black)
                 .padding(16)
 
-            ScrollView {
-                VStack(spacing: 12) {
-                    ForEach(trains) { train in
-                        TrainCellView(train: train)
+            if trains.isEmpty {
+                Spacer()
+                Text("Вариантов нет")
+                    .font(.system(size: 24, weight: .bold))
+                    .foregroundColor(isDarkMode ? .whiteYP : .black)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                Spacer()
+            } else {
+                ScrollView {
+                    VStack(spacing: 12) {
+                        ForEach(trains) { train in
+                            TrainCellView(train: train)
+                        }
                     }
                 }
             }
-
-            Button(action: {}) {
+            
+            Button(action: { showingDepartureTimeView = true }) {
                 Text("Уточнить время")
                     .font(.headline)
                     .foregroundColor(.white)
