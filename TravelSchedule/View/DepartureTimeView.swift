@@ -156,6 +156,7 @@ enum TimeOption: CaseIterable, Hashable {
     }
 }
 
+// MARK: - Preview
 #Preview {
     DepartureTimeView()
 }

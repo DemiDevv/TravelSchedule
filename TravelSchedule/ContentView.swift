@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ContentView: View {
+struct TravelScheduleView: View {
     @AppStorage(Constants.isDarkMode.stringValue) var isDarkMode: Bool = false
     @StateObject private var networkMonitor = NetworkMonitor()
     
@@ -18,38 +18,11 @@ struct ContentView: View {
     var body: some View {
         ZStack {
             if isActive {
-                SplashScreen(isActive: $isActive)
+                SplashView(isActive: $isActive)
             } else {
                 if networkMonitor.isConnected {
                     NavigationStack {
-                        TabView(selection: $selectedTab) {
-                            RouteInputView()
-                                .tabItem {
-                                    Image("schedule_image")
-                                        .renderingMode(.template)
-                                        .foregroundColor(selectedTab == 0 ? (isDarkMode ? .white : .blackYP) : .grayYP)
-                                }
-                                .tag(0)
-                            
-                            SettingsView(errorState: $errorState)
-                                .tabItem {
-                                    Image("settings_image")
-                                        .renderingMode(.template)
-                                        .foregroundColor(selectedTab == 1 ? (isDarkMode ? .white : .blackYP) : .grayYP)
-                                }
-                                .tag(1)
-                        }
-                        .tint(isDarkMode ? .white : .blackYP)
-                        .overlay(
-                            VStack {
-                                Spacer()
-                                Rectangle()
-                                    .fill(isDarkMode ? Color.black : Color.gray.opacity(0.3))
-                                    .frame(height: 0.5)
-                                    .padding(.bottom, 58)
-                            }
-                            .allowsHitTesting(false)
-                        )
+                        MainTabView(selectedTab: $selectedTab, isDarkMode: isDarkMode)
                     }
                 } else {
                     ErrorView(errors: AppError.noInternet)
@@ -59,27 +32,7 @@ struct ContentView: View {
     }
 }
 
-// Network Monitor
-import Network
-
-class NetworkMonitor: ObservableObject {
-    private let monitor = NWPathMonitor()
-    private let queue = DispatchQueue(label: "NetworkMonitor")
-    
-    @Published var isConnected = true
-    
-    init() {
-        monitor.pathUpdateHandler = { path in
-            DispatchQueue.main.async {
-                self.isConnected = path.status == .satisfied
-            }
-        }
-        monitor.start(queue: queue)
-    }
-}
-
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-            ContentView()
-    }
+// MARK: - Preview
+#Preview {
+    TravelScheduleView()
 }

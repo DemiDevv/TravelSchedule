@@ -40,6 +40,7 @@ struct ErrorView: View {
     }
 }
 
+// MARK: - Preview
 #Preview {
     ErrorView(errors: AppError.noInternet)
 }

@@ -98,6 +98,7 @@ struct TrainCellView: View {
     }
 }
 
+// MARK: - Preview
 #Preview {
     let sampleTrain = TrainInfo(
         companyName: "РЖД",
@@ -108,13 +109,5 @@ struct TrainCellView: View {
         arrivalTime: Date().addingTimeInterval(3600 * 5 + 60 * 30), // 5 часов 30 минут
         duration: 3600 * 5 + 60 * 30
     )
-    
-    return Group {
         TrainCellView(train: sampleTrain)
-            .previewDisplayName("Light Mode")
-        
-        TrainCellView(train: sampleTrain)
-            .preferredColorScheme(.dark)
-            .previewDisplayName("Dark Mode")
-    }
 }

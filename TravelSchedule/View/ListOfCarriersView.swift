@@ -55,6 +55,7 @@ struct ListOfCarriersView: View {
     }
 }
 
+// MARK: - Preview
 #Preview {
     // Создаем календарь для удобного создания дат
     let calendar = Calendar.current

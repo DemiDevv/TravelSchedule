@@ -52,6 +52,7 @@ struct UserAgreementView: View {
     }
 }
 
+// MARK: - Preview
 #Preview {
     UserAgreementView(tabBarIsHidden: .constant(true))
 }

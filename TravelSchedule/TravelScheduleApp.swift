@@ -14,7 +14,7 @@ struct TravelScheduleApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            TravelScheduleView()
                 .preferredColorScheme(isDarkMode ? .dark : .light)
                 .animation(.easeOut, value: isDarkMode)
         }
