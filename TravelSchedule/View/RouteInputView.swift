@@ -6,6 +6,29 @@
 //
 import SwiftUI
 
+// Добавьте этот код в новый файл RouteInfo.swift или в начало RouteInputView.swift
+struct RouteInfo: Hashable {
+    let fromCity: City?
+    let fromStation: Station?
+    let toCity: City?
+    let toStation: Station?
+    
+    // Реализация Hashable для использования в NavigationStack
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(fromCity?.name)
+        hasher.combine(fromStation?.name)
+        hasher.combine(toCity?.name)
+        hasher.combine(toStation?.name)
+    }
+    
+    static func == (lhs: RouteInfo, rhs: RouteInfo) -> Bool {
+        lhs.fromCity?.name == rhs.fromCity?.name &&
+        lhs.fromStation?.name == rhs.fromStation?.name &&
+        lhs.toCity?.name == rhs.toCity?.name &&
+        lhs.toStation?.name == rhs.toStation?.name
+    }
+}
+
 struct RouteInputView: View {
     @StateObject private var viewModel = RouteInputViewModel()
     @State private var navigationPath = NavigationPath()
@@ -23,7 +46,15 @@ struct RouteInputView: View {
                 .padding(.top, Constants.spacing)
                 
                 if viewModel.isSearchEnabled {
-                    Button(action: viewModel.performSearch) {
+                    Button(action: {
+                        let routeInfo = RouteInfo(
+                            fromCity: viewModel.fromCity,
+                            fromStation: viewModel.fromStation,
+                            toCity: viewModel.toCity,
+                            toStation: viewModel.toStation
+                        )
+                        navigationPath.append(routeInfo)
+                    }) {
                         Text("Найти")
                             .foregroundColor(.white)
                             .fontWeight(.bold)
@@ -58,8 +89,48 @@ struct RouteInputView: View {
                     .ignoresSafeArea(edges: .bottom)
                 }
             }
+            .navigationDestination(for: RouteInfo.self) { routeInfo in
+                ListOfCarriersView(
+                    routeInfo: routeInfo,
+                    trains: mockTrains(for: routeInfo) // Здесь передаем моковые данные
+                )
+            }
             .navigationBarBackButtonHidden(true)
         }
     }
+    
+    // Функция для создания тестовых данных о поездах
+    private func mockTrains(for routeInfo: RouteInfo) -> [TrainInfo] {
+        let calendar = Calendar.current
+        let now = Date()
+        
+        func createDate(day: Int, hour: Int, minute: Int) -> Date {
+            var components = calendar.dateComponents([.year, .month], from: now)
+            components.day = day
+            components.hour = hour
+            components.minute = minute
+            return calendar.date(from: components)!
+        }
+        
+        return [
+            TrainInfo(
+                companyName: "РЖД",
+                companyLogo: Image(systemName: "tram.fill"),
+                note: "Костроме",
+                date: createDate(day: 14, hour: 0, minute: 0),
+                departureTime: createDate(day: 14, hour: 22, minute: 30),
+                arrivalTime: createDate(day: 15, hour: 8, minute: 15),
+                duration: 20 * 3600
+            ),
+            TrainInfo(
+                companyName: "ФГК",
+                companyLogo: Image(systemName: "bolt.car.fill"),
+                note: nil,
+                date: createDate(day: 15, hour: 0, minute: 0),
+                departureTime: createDate(day: 15, hour: 1, minute: 15),
+                arrivalTime: createDate(day: 15, hour: 9, minute: 0),
+                duration: 9 * 3600
+            )
+        ]
+    }
 }
-

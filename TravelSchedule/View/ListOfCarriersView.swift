@@ -8,36 +8,45 @@
 import SwiftUI
 
 struct ListOfCarriersView: View {
+    let routeInfo: RouteInfo
     let trains: [TrainInfo]
+    
     @AppStorage(Constants.isDarkMode.stringValue) private var isDarkMode: Bool = false
     @State private var showingDepartureTimeView = false
+    @Environment(\.dismiss) private var dismiss
+    
+    private var routeTitle: String {
+        let fromText = "\(routeInfo.fromCity?.name ?? "") (\(routeInfo.fromStation?.name ?? ""))"
+        let toText = "\(routeInfo.toCity?.name ?? "") (\(routeInfo.toStation?.name ?? ""))"
+        return "\(fromText) → \(toText)"
+    }
     
     var body: some View {
-        NavigationStack {
-            contentView
-                .navigationDestination(isPresented: $showingDepartureTimeView) {
-                    DepartureTimeView()
-                        .navigationBarBackButtonHidden(true) // Скрываем стандартную кнопку назад
-                }
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarLeading) {
-                        Button(action: {}) {
-                            Image(systemName: "chevron.left")
-                                .foregroundColor(isDarkMode ? .white : .black)
-                                .font(.system(size: 22, weight: .medium))
-                        }
+        contentView
+            .navigationBarBackButtonHidden(true)
+            .navigationDestination(isPresented: $showingDepartureTimeView) {
+                DepartureTimeView()
+                    .navigationBarBackButtonHidden(true)
+            }
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: {
+                        dismiss()
+                    }) {
+                        Image(systemName: "chevron.left")
+                            .foregroundColor(isDarkMode ? .white : .black)
+                            .font(.system(size: 22, weight: .medium))
                     }
                 }
-        }
+            }
     }
     
     private var contentView: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Москва (Ярославский вокзал) → Санкт Петербург(Балтийский вокзал)")
+        VStack(alignment: .leading, spacing: 16) {
+            Text(routeTitle)
                 .font(.system(size: 24, weight: .bold))
                 .foregroundColor(isDarkMode ? .whiteYP : .black)
-                .padding(16)
-
+            
             if trains.isEmpty {
                 Spacer()
                 Text("Вариантов нет")
@@ -54,7 +63,7 @@ struct ListOfCarriersView: View {
                     }
                 }
             }
-            
+
             Button(action: { showingDepartureTimeView = true }) {
                 Text("Уточнить время")
                     .font(.headline)
@@ -64,20 +73,25 @@ struct ListOfCarriersView: View {
             .frame(height: 60)
             .background(Color.blueYP)
             .cornerRadius(16)
-            .padding(.horizontal)
             .padding(.top, 8)
         }
+        .padding(16) // ВАЖНО: отступ от ВСЕХ краёв
         .background(isDarkMode ? Color.blackYP : Color.white)
     }
 }
 
 // MARK: - Preview
 #Preview {
-    // Создаем календарь для удобного создания дат
+    let mockRouteInfo = RouteInfo(
+        fromCity: City(name: "Москва", stations: [Station(name: "Ярославский вокзал")]),
+        fromStation: Station(name: "Ярославский вокзал"),
+        toCity: City(name: "Санкт-Петербург", stations: [Station(name: "Балтийский вокзал")]),
+        toStation: Station(name: "Балтийский вокзал")
+    )
+    
     let calendar = Calendar.current
     let now = Date()
     
-    // Функция для создания даты из компонентов
     func createDate(day: Int, hour: Int, minute: Int) -> Date {
         var components = calendar.dateComponents([.year, .month], from: now)
         components.day = day
@@ -86,42 +100,29 @@ struct ListOfCarriersView: View {
         return calendar.date(from: components)!
     }
     
-    return ListOfCarriersView(trains: [
+    let mockTrains = [
         TrainInfo(
             companyName: "РЖД",
             companyLogo: Image(systemName: "tram.fill"),
             note: "Костроме",
-            date: createDate(day: 14, hour: 0, minute: 0), // 14 января
+            date: createDate(day: 14, hour: 0, minute: 0),
             departureTime: createDate(day: 14, hour: 22, minute: 30),
-            arrivalTime: createDate(day: 15, hour: 8, minute: 15), // прибытие на следующий день
-            duration: 20 * 3600 // 20 часов в секундах
+            arrivalTime: createDate(day: 15, hour: 8, minute: 15),
+            duration: 20 * 3600
         ),
         TrainInfo(
             companyName: "ФГК",
             companyLogo: Image(systemName: "bolt.car.fill"),
             note: nil,
-            date: createDate(day: 15, hour: 0, minute: 0), // 15 января
+            date: createDate(day: 15, hour: 0, minute: 0),
             departureTime: createDate(day: 15, hour: 1, minute: 15),
             arrivalTime: createDate(day: 15, hour: 9, minute: 0),
-            duration: 9 * 3600 // 9 часов в секундах
-        ),
-        TrainInfo(
-            companyName: "Урал логистика",
-            companyLogo: Image(systemName: "drop.fill"),
-            note: nil,
-            date: createDate(day: 16, hour: 0, minute: 0), // 16 января
-            departureTime: createDate(day: 16, hour: 12, minute: 30),
-            arrivalTime: createDate(day: 16, hour: 21, minute: 0),
-            duration: 9 * 3600 // 9 часов в секундах
-        ),
-        TrainInfo(
-            companyName: "РЖД",
-            companyLogo: Image(systemName: "tram.fill"),
-            note: "Волгограде",
-            date: createDate(day: 17, hour: 0, minute: 0), // 17 января
-            departureTime: createDate(day: 17, hour: 22, minute: 30),
-            arrivalTime: createDate(day: 18, hour: 8, minute: 15), // прибытие на следующий день
-            duration: 20 * 3600 // 20 часов в секундах
+            duration: 9 * 3600
         )
-    ])
+    ]
+    
+    return ListOfCarriersView(
+        routeInfo: mockRouteInfo,
+        trains: mockTrains
+    )
 }

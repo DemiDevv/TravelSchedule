@@ -94,7 +94,6 @@ struct TrainCellView: View {
         }
         .frame(height: 104)
         .clipShape(RoundedRectangle(cornerRadius: 20))
-        .padding(.horizontal)
     }
 }
 

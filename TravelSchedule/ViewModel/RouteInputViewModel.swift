@@ -41,16 +41,4 @@ final class RouteInputViewModel: ObservableObject {
             swap(&fromStation, &toStation)
         }
     }
-    
-    func performSearch() {
-        guard let fromCity = fromCity,
-              let fromStation = fromStation,
-              let toCity = toCity,
-              let toStation = toStation else { return }
-        
-        print("""
-        Откуда: \(fromCity.name) (\(fromStation.name))
-        Куда: \(toCity.name) (\(toStation.name))
-        """)
-    }
 }
