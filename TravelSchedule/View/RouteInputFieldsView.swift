@@ -44,18 +44,23 @@ struct RouteInputFields: View {
             navigationPath.append(Destination.choiceCity(fromField: isFromField))
         }) {
             Text(viewModel.displayText(isFromField: isFromField))
-                .foregroundColor(viewModel.textColor(
-                    for: viewModel.displayText(isFromField: isFromField),
-                    isDarkMode: isDarkMode
-                ))
+                .foregroundColor(textColor(for: viewModel.displayText(isFromField: isFromField)))
                 .font(.system(size: Constants.fontSize))
-                .lineLimit(1) // Ограничиваем одной строкой
-                .truncationMode(.tail) // Обрезаем с конца
+                .lineLimit(1)
+                .truncationMode(.tail)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .fixedSize(horizontal: false, vertical: true) // Фиксируем вертикальный размер
+                .fixedSize(horizontal: false, vertical: true)
         }
         .buttonStyle(PlainButtonStyle())
-        .frame(height: Constants.inputFieldHeight) // Фиксированная высота поля
+        .frame(height: Constants.inputFieldHeight)
+    }
+
+    private func textColor(for text: String) -> Color {
+        if text == "Откуда" || text == "Куда" {
+            return .gray
+        } else {
+            return .blackYP // Всегда черный, исправления для ревью
+        }
     }
     
     private var swapButton: some View {
