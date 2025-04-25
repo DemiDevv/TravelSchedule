@@ -4,47 +4,57 @@
 //
 //  Created by Demain Petropavlov on 08.04.2025.
 //
+
 import SwiftUI
 
 struct RouteInputView: View {
     @StateObject private var viewModel = RouteInputViewModel()
+    @StateObject private var storiesData = StoriesStabData.shared
     @State private var navigationPath = NavigationPath()
     @AppStorage(Constants.isDarkMode.stringValue) private var isDarkMode: Bool = false
     
     var body: some View {
         NavigationStack(path: $navigationPath) {
-            VStack(spacing: Constants.spacing) {
+            VStack(spacing: 0) {
+                // Горизонтальная лента сторис
+                StoriesHorizontalView(stories: $storiesData.stories)
+                
+                // Отступ 44 между сторис и основным контентом
                 Spacer()
+                    .frame(height: 44)
                 
-                RouteInputFields(
-                    viewModel: viewModel,
-                    navigationPath: $navigationPath
-                )
-                .padding(.top, Constants.spacing)
-                
-                if viewModel.isSearchEnabled {
-                    Button(action: {
-                        let routeInfo = RouteInfo(
-                            fromCity: viewModel.fromCity,
-                            fromStation: viewModel.fromStation,
-                            toCity: viewModel.toCity,
-                            toStation: viewModel.toStation
-                        )
-                        navigationPath.append(routeInfo)
-                    }) {
-                        Text("Найти")
-                            .foregroundColor(.white)
-                            .fontWeight(.bold)
-                            .frame(width: 150, height: 60)
-                            .background(Color.blueYP)
-                            .cornerRadius(Constants.cornerRadius)
+                // Основной контент
+                VStack(spacing: Constants.spacing) {
+                    RouteInputFields(
+                        viewModel: viewModel,
+                        navigationPath: $navigationPath
+                    )
+                    .padding(.top, Constants.spacing)
+                    
+                    if viewModel.isSearchEnabled {
+                        Button(action: {
+                            let routeInfo = RouteInfo(
+                                fromCity: viewModel.fromCity,
+                                fromStation: viewModel.fromStation,
+                                toCity: viewModel.toCity,
+                                toStation: viewModel.toStation
+                            )
+                            navigationPath.append(routeInfo)
+                        }) {
+                            Text("Найти")
+                                .foregroundColor(.white)
+                                .fontWeight(.bold)
+                                .frame(width: 150, height: 60)
+                                .background(Color.blueYP)
+                                .cornerRadius(Constants.cornerRadius)
+                        }
+                        .padding(.bottom, Constants.spacing)
                     }
-                    .padding(.bottom, Constants.spacing)
+                    
+                    Spacer()
                 }
-                
-                Spacer()
+                .padding(.horizontal)
             }
-            .padding(.horizontal)
             .background(isDarkMode ? Color.blackYP : Color.white)
             .navigationDestination(for: Destination.self) { destination in
                 switch destination {
@@ -69,8 +79,11 @@ struct RouteInputView: View {
             .navigationDestination(for: RouteInfo.self) { routeInfo in
                 ListOfCarriersView(
                     routeInfo: routeInfo,
-                    trains: mockTrains(for: routeInfo) // Здесь передаем моковые данные
+                    trains: mockTrains(for: routeInfo)
                 )
+            }
+            .navigationDestination(for: Story.self) { story in
+                // TODO: - Открывание фулл экрана сторис
             }
             .navigationBarBackButtonHidden(true)
         }
