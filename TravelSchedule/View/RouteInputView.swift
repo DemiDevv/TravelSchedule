@@ -76,7 +76,6 @@ struct RouteInputView: View {
         }
     }
     
-    // Функция для создания тестовых данных о поездах
     private func mockTrains(for routeInfo: RouteInfo) -> [TrainInfo] {
         let calendar = Calendar.current
         let now = Date()
