@@ -18,6 +18,9 @@ struct RouteInputView: View {
     var body: some View {
         NavigationStack(path: $navigationPath) {
             VStack(spacing: 0) {
+                
+                Spacer()
+                    .frame(height: 24)
                 // Горизонтальная лента сторис
                 StoriesHorizontalView(stories: $storiesData.stories) { story in
                     if let index = storiesData.stories.firstIndex(where: { $0.id == story.id }) {

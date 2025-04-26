@@ -38,10 +38,10 @@ struct StoriesView: View {
                 currentProgress: $currentProgress
             )
             .padding(.horizontal, 12)
-            .padding(.top, 28)
+            .padding(.top, 79)
             
             CloseButton(action: onClose)
-            .padding(.top, 57)
+            .padding(.top, 104)
             .padding(.trailing, 12)
         }
         .background(Color.black)

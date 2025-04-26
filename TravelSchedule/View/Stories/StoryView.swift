@@ -11,28 +11,29 @@ struct StoryView: View {
     let content: ContentStory
 
     var body: some View {
-        ZStack {
+        ZStack(alignment: .bottomLeading) {
             Color.blackYP
-                .ignoresSafeArea() // Черный фон
+                .ignoresSafeArea()
 
             Image(content.big)
                 .resizable()
-                .aspectRatio(contentMode: .fit) // Показывать полностью без обрезания
                 .clipShape(RoundedRectangle(cornerRadius: 40))
 
-            VStack {
+            VStack(alignment: .leading, spacing: 16) {
+                
                 Spacer()
-                VStack(alignment: .leading, spacing: 10) {
+                
                     Text(content.title)
                         .font(.bold34)
                         .foregroundColor(.white)
+                        .lineLimit(2)
                     Text(content.description)
                         .font(.regular20)
                         .lineLimit(3)
                         .foregroundColor(.white)
-                }
-                .padding(.init(top: 0, leading: 16, bottom: 40, trailing: 16))
+                
             }
+            .padding(.init(top: 0, leading: 16, bottom: 40, trailing: 16))
         }
     }
 }
