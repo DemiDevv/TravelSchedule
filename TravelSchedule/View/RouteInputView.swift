@@ -11,13 +11,20 @@ struct RouteInputView: View {
     @StateObject private var viewModel = RouteInputViewModel()
     @StateObject private var storiesData = StoriesStabData.shared
     @State private var navigationPath = NavigationPath()
+    @State private var isShowingFullscreenStory = false
+    @State private var selectedStoryIndex = 0
     @AppStorage(Constants.isDarkMode.stringValue) private var isDarkMode: Bool = false
     
     var body: some View {
         NavigationStack(path: $navigationPath) {
             VStack(spacing: 0) {
                 // Горизонтальная лента сторис
-                StoriesHorizontalView(stories: $storiesData.stories)
+                StoriesHorizontalView(stories: $storiesData.stories) { story in
+                    if let index = storiesData.stories.firstIndex(where: { $0.id == story.id }) {
+                        storiesData.stories[index].isViewed = true
+                        navigationPath.append(story)
+                    }
+                }
                 
                 // Отступ 44 между сторис и основным контентом
                 Spacer()
@@ -83,7 +90,18 @@ struct RouteInputView: View {
                 )
             }
             .navigationDestination(for: Story.self) { story in
-                // TODO: - Открывание фулл экрана сторис
+                ZStack(alignment: .topTrailing) {
+                    StoriesView(
+                        stories: storiesData.stories,
+                        currentStoryIndex: .constant(storiesData.stories.firstIndex(of: story) ?? 0),
+                        onClose: {
+                            navigationPath.removeLast()
+                        }
+                    )
+                    .ignoresSafeArea()
+                }
+                .background(Color.black)
+                .navigationBarBackButtonHidden(true)
             }
             .navigationBarBackButtonHidden(true)
         }

@@ -10,21 +10,28 @@ import SwiftUI
 struct StoriesTabView: View {
     let stories: [Story]
     @Binding var currentStoryIndex: Int
+    @Binding var currentContentIndex: Int
+
+    private var currentContentStories: [ContentStory] {
+        stories[currentStoryIndex].story
+    }
 
     var body: some View {
-        TabView(selection: $currentStoryIndex) {
-            ForEach(stories) { story in
-                StoryView(story: story)
+        TabView(selection: $currentContentIndex) {
+            ForEach(currentContentStories) { content in
+                StoryView(content: content)
                     .onTapGesture {
-                        didTapStory()
+                        didTapContent()
                     }
+                    .tag(currentContentStories.firstIndex(of: content) ?? 0)
             }
         }
         .ignoresSafeArea()
         .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
     }
 
-    func didTapStory() {
-        currentStoryIndex = min(currentStoryIndex + 1, stories.count - 1)
+    private func didTapContent() {
+        currentContentIndex = min(currentContentIndex + 1, currentContentStories.count - 1)
     }
 }
+

@@ -9,7 +9,8 @@ import SwiftUI
 
 struct StoriesHorizontalView: View {
     @Binding var stories: [Story]
-    
+    var onStoryTap: (Story) -> Void
+
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 12) {
@@ -17,11 +18,11 @@ struct StoriesHorizontalView: View {
                     StoryPreviewCellView(story: story)
                         .onTapGesture {
                             story.isViewed = true
+                            onStoryTap(story)
                         }
                 }
             }
-            .padding(.leading, 16)
-            .padding(.trailing, 16)
+            .padding(.horizontal, 16)
         }
     }
 }

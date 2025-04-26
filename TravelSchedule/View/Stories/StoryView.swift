@@ -8,26 +8,25 @@
 import SwiftUI
 
 struct StoryView: View {
-    let story: Story  // Теперь принимает Story, а не ContentStory
-    @State private var currentContentIndex = 0
+    let content: ContentStory
 
     var body: some View {
         ZStack {
-            // Отображаем текущий ContentStory
-            Image(story.story[currentContentIndex].big)
+            Color.blackYP
+                .ignoresSafeArea() // Черный фон
+
+            Image(content.big)
                 .resizable()
-                .scaledToFill()
-                .ignoresSafeArea()
-                .overlay(Color.black.opacity(0.3))
-            
-            // Контент поверх изображения
+                .aspectRatio(contentMode: .fit) // Показывать полностью без обрезания
+                .clipShape(RoundedRectangle(cornerRadius: 40))
+
             VStack {
                 Spacer()
                 VStack(alignment: .leading, spacing: 10) {
-                    Text(story.story[currentContentIndex].title)
+                    Text(content.title)
                         .font(.bold34)
                         .foregroundColor(.white)
-                    Text(story.story[currentContentIndex].description)
+                    Text(content.description)
                         .font(.regular20)
                         .lineLimit(3)
                         .foregroundColor(.white)
@@ -35,15 +34,5 @@ struct StoryView: View {
                 .padding(.init(top: 0, leading: 16, bottom: 40, trailing: 16))
             }
         }
-        .onTapGesture {
-            // Переход к следующему ContentStory или следующей Story
-            if currentContentIndex < story.story.count - 1 {
-                currentContentIndex += 1
-            } else {
-                // Здесь можно закрыть StoryView или перейти к следующей Story
-            }
-        }
     }
 }
-
-
