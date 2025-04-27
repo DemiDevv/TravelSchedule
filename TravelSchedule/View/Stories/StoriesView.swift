@@ -73,3 +73,22 @@ struct StoriesView: View {
         }
     }
 }
+
+// MARK: - Preview
+#Preview {
+    StoriesView(
+        stories: [
+            Story(
+                small: .preview1,
+                title: "Story 1",
+                isViewed: false,
+                story: [
+                    ContentStory(big: .big1, title: "Page 1", description: "Description 1"),
+                    ContentStory(big: .big2, title: "Page 2", description: "Description 2")
+                ]
+            )
+        ],
+        currentStoryIndex: .constant(0),
+        onClose: {}
+    )
+}

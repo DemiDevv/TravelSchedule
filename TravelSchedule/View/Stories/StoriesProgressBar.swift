@@ -49,3 +49,16 @@ extension StoriesProgressBar {
         Timer.publish(every: configuration.timerTickInternal, on: .main, in: .common)
     }
 }
+
+//MARK: - Preview
+#Preview {
+    StoriesProgressBar(
+        storiesCount: 5,
+        timerConfiguration: TimerConfiguration(
+            storiesCount: 5,
+            secondsPerStory: 5,
+            timerTickInternal: 0.1
+        ),
+        currentProgress: .constant(0.5)
+    )
+}

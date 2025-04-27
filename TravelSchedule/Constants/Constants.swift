@@ -29,3 +29,9 @@ extension Constants {
     static let innerCornerRadius: CGFloat = 20
     static let swapButtonPadding: CGFloat = 12
 }
+
+extension Constants {
+    static let shortTextTitle = "Text Text Text Text Text Text Text Text Text Text Text Text"
+    static let longTextTitle = "Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text"
+    static let longTextDescription = "Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text"
+}

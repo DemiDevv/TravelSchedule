@@ -36,3 +36,17 @@ struct StoryPreviewCellView: View {
         .frame(width: 100, height: 148)
     }
 }
+
+// MARK: - Preview
+#Preview {
+    StoryPreviewCellView(
+        story: Story(
+            small: .preview1,
+            title: "Sample Story Title",
+            isViewed: false,
+            story: [
+                ContentStory(big: .big1, title: "Page 1", description: "Description 1")
+            ]
+        )
+    )
+}

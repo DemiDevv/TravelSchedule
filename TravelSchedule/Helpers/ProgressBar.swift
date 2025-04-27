@@ -61,11 +61,25 @@ private struct MaskFragmentView: View {
     }
 }
 
-//#Preview {
-//    Color.story1Background
-//        .ignoresSafeArea()
-//        .overlay(
-//            ProgressBar(numberOfSections: 5, progress: 0.5)
-//                .padding()
-//        )
-//}
+// MARK: - Preview
+#Preview("ProgressBar Example") {
+    ZStack {
+        Color.gray.opacity(0.2)
+            .ignoresSafeArea()
+        
+        VStack(spacing: 20) {
+            ProgressBar(numberOfSections: 5, progress: 0.25)
+                .padding()
+            
+            ProgressBar(numberOfSections: 5, progress: 0.5)
+                .padding()
+            
+            ProgressBar(numberOfSections: 5, progress: 0.75)
+                .padding()
+            
+            ProgressBar(numberOfSections: 5, progress: 1.0)
+                .padding()
+        }
+        .padding()
+    }
+}

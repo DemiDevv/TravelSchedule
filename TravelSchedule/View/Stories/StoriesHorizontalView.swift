@@ -26,3 +26,13 @@ struct StoriesHorizontalView: View {
         }
     }
 }
+
+// MARK: - Preview
+#Preview("Stories Horizontal View Preview") {
+    @State var stories = StoriesStabData.shared.stories
+    
+    return StoriesHorizontalView(stories: $stories) { story in
+        print("Tapped on story: \(story.title)")
+    }
+    .background(Color.gray.opacity(0.1))
+}
