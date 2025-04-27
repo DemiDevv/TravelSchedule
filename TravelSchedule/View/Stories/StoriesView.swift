@@ -14,7 +14,8 @@ struct StoriesView: View {
     
     @State private var currentContentIndex: Int = 0
     @State private var currentProgress: CGFloat = 0
-    
+    @GestureState private var dragOffset: CGSize = .zero
+
     private var timerConfiguration: TimerConfiguration {
         .init(storiesCount: currentContentStories.count)
     }
@@ -31,6 +32,19 @@ struct StoriesView: View {
                 currentStoryIndex: $currentStoryIndex,
                 currentContentIndex: $currentContentIndex
             )
+            .gesture(
+                DragGesture()
+                    .updating($dragOffset) { value, state, _ in
+                        if value.translation.height > 0 {
+                            state = value.translation
+                        }
+                    }
+                    .onEnded { value in
+                        if value.translation.height > 100 {
+                            onClose()
+                        }
+                    }
+            )
             
             StoriesProgressBar(
                 storiesCount: currentContentStories.count,
@@ -41,15 +55,12 @@ struct StoriesView: View {
             .padding(.top, 79)
             
             CloseButton(action: onClose)
-            .padding(.top, 104)
-            .padding(.trailing, 12)
+                .padding(.top, 104)
+                .padding(.trailing, 12)
         }
         .background(Color.black)
         .onChange(of: currentContentIndex) { oldValue, newValue in
             didChangeCurrentIndex(oldIndex: oldValue, newIndex: newValue)
-        }
-        .onChange(of: currentProgress) { _, newValue in
-            didChangeCurrentProgress(newProgress: newValue)
         }
     }
 
@@ -59,14 +70,6 @@ struct StoriesView: View {
         guard abs(progress - currentProgress) >= 0.01 else { return }
         withAnimation {
             currentProgress = progress
-        }
-    }
-
-    private func didChangeCurrentProgress(newProgress: CGFloat) {
-        let index = timerConfiguration.index(for: newProgress)
-        guard index != currentContentIndex else { return }
-        withAnimation {
-            currentContentIndex = index
         }
     }
 }

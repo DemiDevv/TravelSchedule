@@ -17,21 +17,31 @@ struct StoriesTabView: View {
     }
 
     var body: some View {
-        TabView(selection: $currentContentIndex) {
-            ForEach(currentContentStories) { content in
-                StoryView(content: content)
-                    .onTapGesture {
-                        didTapContent()
-                    }
-                    .tag(currentContentStories.firstIndex(of: content) ?? 0)
+        GeometryReader { geometry in
+            TabView(selection: $currentContentIndex) {
+                ForEach(currentContentStories) { content in
+                    StoryView(content: content)
+                        .contentShape(Rectangle()) // Важно: чтобы весь экран ловил нажатия
+                        .onTapGesture { location in
+                            didTapContent(at: location, in: geometry.size)
+                        }
+                        .tag(currentContentStories.firstIndex(of: content) ?? 0)
+                }
             }
+            .ignoresSafeArea()
+            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
         }
-        .ignoresSafeArea()
-        .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
     }
 
-    private func didTapContent() {
-        currentContentIndex = min(currentContentIndex + 1, currentContentStories.count - 1)
+    private func didTapContent(at location: CGPoint, in size: CGSize) {
+        let isLeftSide = location.x < size.width / 2
+        
+        if isLeftSide {
+            // Нажали слева — назад
+            currentContentIndex = max(currentContentIndex - 1, 0)
+        } else {
+            // Нажали справа — вперёд
+            currentContentIndex = min(currentContentIndex + 1, currentContentStories.count - 1)
+        }
     }
 }
-
