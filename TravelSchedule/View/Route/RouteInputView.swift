@@ -84,10 +84,7 @@ struct RouteInputView: View {
                 }
             }
             .navigationDestination(for: RouteInfo.self) { routeInfo in
-                ListOfCarriersView(
-                    routeInfo: routeInfo,
-                    trains: mockTrains(for: routeInfo)
-                )
+                ListOfCarriersView(routeInfo: routeInfo)
             }
             .navigationDestination(for: Story.self) { story in
                 ZStack(alignment: .topTrailing) {

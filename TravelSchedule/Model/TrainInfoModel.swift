@@ -17,3 +17,17 @@ struct TrainInfo: Identifiable {
     let arrivalTime: Date
     let duration: TimeInterval
 }
+
+struct RouteCarrierStruct: Hashable, Identifiable {
+    let id = UUID()
+    let carrierImage: String
+    let carrierName: String
+    let transferInfo: Bool
+    let routeDate: String
+    let routeStartTime: String
+    let routeEndTime: String
+    let routeDuration: String
+    let carrierCode: String
+    let carrierMail: String
+    let carrierPhone: String
+}
