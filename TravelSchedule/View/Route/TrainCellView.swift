@@ -36,12 +36,26 @@ struct TrainCellView: View {
             
             VStack(spacing: 16) {
                 HStack(alignment: .top) {
-                    train.companyLogo
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 38, height: 38)
-                        .padding(.leading, 8)
-                        .foregroundColor(isDarkMode ? .blackYP : .primary)
+                    if let urlString = train.companyLogoURL, let url = URL(string: urlString) {
+                        AsyncImage(url: url) { image in
+                            image
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 38, height: 38)
+                                .padding(.leading, 8)
+                        } placeholder: {
+                            ProgressView()
+                                .frame(width: 38, height: 38)
+                                .padding(.leading, 8)
+                        }
+                    } else {
+                        Image(systemName: "tram.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 38, height: 38)
+                            .padding(.leading, 8)
+                            .foregroundColor(isDarkMode ? .blackYP : .primary)
+                    }
                     
                     VStack(alignment: .leading, spacing: 4) {
                         HStack {
@@ -57,7 +71,7 @@ struct TrainCellView: View {
                         }
                         
                         if let note = train.note {
-                            Text("С пересадкой в \(note)")
+                            Text(note)
                                 .font(.system(size: 12))
                                 .foregroundColor(.redYP)
                         }
@@ -95,18 +109,4 @@ struct TrainCellView: View {
         .frame(height: 104)
         .clipShape(RoundedRectangle(cornerRadius: 20))
     }
-}
-
-// MARK: - Preview
-#Preview {
-    let sampleTrain = TrainInfo(
-        companyName: "РЖД",
-        companyLogo: Image(systemName: "train.side.front.car"),
-        note: "Костроме",
-        date: Date(),
-        departureTime: Date(),
-        arrivalTime: Date().addingTimeInterval(3600 * 5 + 60 * 30), // 5 часов 30 минут
-        duration: 3600 * 5 + 60 * 30
-    )
-        TrainCellView(train: sampleTrain)
 }

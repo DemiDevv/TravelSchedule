@@ -30,7 +30,7 @@ final class RouteInputViewModel: ObservableObject {
         let station = isFromField ? fromStation : toStation
         
         if let city = city, let station = station {
-            return "\(city.name) (\(station.name))"
+            return "\(station.name)"
         } else if let city = city {
             return city.name
         }

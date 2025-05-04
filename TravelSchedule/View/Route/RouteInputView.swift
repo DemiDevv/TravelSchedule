@@ -127,44 +127,6 @@ struct RouteInputView: View {
             showErrorAlert = true
         }
     }
-    
-    private func mockTrains(for routeInfo: RouteInfo) -> [TrainInfo] {
-        let calendar = Calendar.current
-        let now = Date()
-        
-        func createDate(day: Int, hour: Int, minute: Int) -> Date? {
-            var components = calendar.dateComponents([.year, .month], from: now)
-            components.day = day
-            components.hour = hour
-            components.minute = minute
-            
-            guard let date = calendar.date(from: components) else {
-                return nil
-            }
-            return date
-        }
-        
-        return [
-            TrainInfo(
-                companyName: "РЖД",
-                companyLogo: Image(systemName: "tram.fill"),
-                note: "Костроме",
-                date: createDate(day: 14, hour: 0, minute: 0) ?? Date(),
-                departureTime: createDate(day: 14, hour: 22, minute: 30) ?? Date(),
-                arrivalTime: createDate(day: 15, hour: 8, minute: 15) ?? Date(),
-                duration: 20 * 3600
-            ),
-            TrainInfo(
-                companyName: "ФГК",
-                companyLogo: Image(systemName: "bolt.car.fill"),
-                note: nil,
-                date: createDate(day: 15, hour: 0, minute: 0) ?? Date(),
-                departureTime: createDate(day: 15, hour: 1, minute: 15) ?? Date(),
-                arrivalTime: createDate(day: 15, hour: 9, minute: 0) ?? Date(),
-                duration: 9 * 3600
-            )
-        ]
-    }
 }
 
 #Preview("Route Input View Preview") {

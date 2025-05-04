@@ -8,14 +8,20 @@
 import SwiftUI
 
 struct DepartureTimeView: View {
-    @State private var selectedTimes: Set<TimeOption> = [.morning, .night]
-    @State private var withTransfers: Bool? = false
-    @AppStorage(Constants.isDarkMode.stringValue) private var isDarkMode: Bool = false
+    @ObservedObject var viewModel: ListOfCarriersViewModel
     @Environment(\.dismiss) private var dismiss
+    @State private var selectedTimes: [String] = []
+    @State private var showWithTransfers: Bool? = nil
+    @AppStorage(Constants.isDarkMode.stringValue) private var isDarkMode: Bool = false
+    
+    init(viewModel: ListOfCarriersViewModel) {
+        self.viewModel = viewModel
+        self._selectedTimes = State(initialValue: viewModel.filterArray)
+        self._showWithTransfers = State(initialValue: viewModel.isShowWithTransfers)
+    }
     
     var body: some View {
         VStack(spacing: 16) {
-            // MARK: Время отправления
             VStack(alignment: .leading, spacing: 0) {
                 Text("Время отправления")
                     .font(.system(size: 24, weight: .bold))
@@ -25,20 +31,19 @@ struct DepartureTimeView: View {
                 ForEach(TimeOption.allCases, id: \.self) { option in
                     CustomCheckboxRow(
                         title: option.label,
-                        isSelected: selectedTimes.contains(option),
+                        isSelected: selectedTimes.contains(option.rawValue),
                         isDarkMode: isDarkMode
                     ) {
-                        if selectedTimes.contains(option) {
-                            selectedTimes.remove(option)
+                        if selectedTimes.contains(option.rawValue) {
+                            selectedTimes.removeAll { $0 == option.rawValue }
                         } else {
-                            selectedTimes.insert(option)
+                            selectedTimes.append(option.rawValue)
                         }
                     }
                 }
             }
             .padding(.horizontal, 16)
 
-            // MARK: Пересадки
             VStack(alignment: .leading, spacing: 0) {
                 Text("Показывать варианты с пересадками")
                     .font(.system(size: 24, weight: .bold))
@@ -47,18 +52,18 @@ struct DepartureTimeView: View {
 
                 CustomRadioRow(
                     title: "Да",
-                    isSelected: withTransfers == true,
+                    isSelected: showWithTransfers == true,
                     isDarkMode: isDarkMode
                 ) {
-                    withTransfers = true
+                    showWithTransfers = true
                 }
 
                 CustomRadioRow(
                     title: "Нет",
-                    isSelected: withTransfers == false,
+                    isSelected: showWithTransfers == false,
                     isDarkMode: isDarkMode
                 ) {
-                    withTransfers = false
+                    showWithTransfers = false
                 }
             }
             .padding(.horizontal, 16)
@@ -66,7 +71,9 @@ struct DepartureTimeView: View {
             Spacer()
 
             Button(action: {
-                dismiss() // Закрываем экран при нажатии
+                viewModel.filterArray = selectedTimes
+                viewModel.isShowWithTransfers = showWithTransfers
+                dismiss()
             }) {
                 Text("Применить")
                     .font(.headline)
@@ -81,7 +88,7 @@ struct DepartureTimeView: View {
         }
         .padding(.top, 16)
         .background(isDarkMode ? Color.blackYP : Color.whiteYP)
-        .navigationBarBackButtonHidden(true) // Скрываем стандартную кнопку
+        .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: { dismiss() }) {
@@ -92,9 +99,4 @@ struct DepartureTimeView: View {
             }
         }
     }
-}
-
-// MARK: - Preview
-#Preview {
-    DepartureTimeView()
 }

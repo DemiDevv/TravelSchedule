@@ -10,7 +10,7 @@ import SwiftUI
 struct TrainInfo: Identifiable {
     let id = UUID()
     let companyName: String
-    let companyLogo: Image
+    let companyLogoURL: String?
     let note: String?
     let date: Date
     let departureTime: Date

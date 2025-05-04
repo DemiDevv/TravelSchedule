@@ -9,7 +9,7 @@ import SwiftUI
 
 struct CarriersCardView: View {
     let carrier: Carrier
-    
+    @Environment(\.dismiss) private var dismiss
     @AppStorage(Constants.isDarkMode.stringValue) private var isDarkMode: Bool = false
     
     private var backgroundColor: Color {
@@ -23,7 +23,6 @@ struct CarriersCardView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
-                // Логотип
                 if !carrier.logoURL.isEmpty, let url = URL(string: carrier.logoURL) {
                     AsyncImage(url: url) { image in
                         image
@@ -43,7 +42,6 @@ struct CarriersCardView: View {
                     .padding(.top, 16)
                 }
                 
-                // Контент
                 VStack(alignment: .leading, spacing: 16) {
                     Text(carrier.name)
                         .font(.system(size: 20, weight: .bold))
@@ -85,7 +83,7 @@ struct CarriersCardView: View {
             
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: {
-                    // Навигация назад
+                    dismiss()
                 }) {
                     Image(systemName: "chevron.left")
                         .font(.system(size: 17, weight: .medium))
@@ -94,17 +92,5 @@ struct CarriersCardView: View {
             }
         }
         .navigationBarTitleDisplayMode(.inline)
-    }
-}
-
-// MARK: - Preview
-#Preview {
-    NavigationView {
-        CarriersCardView(carrier: Carrier(
-            name: "ОАО «РЖД»",
-            logoURL: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/RZD.svg/2560px-RZD.svg.png",
-            email: "i.lozgkina@yandex.ru",
-            phone: "+7 (904) 329-27-71"
-        ))
     }
 }

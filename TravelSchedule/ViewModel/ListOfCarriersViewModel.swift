@@ -17,8 +17,22 @@ final class ListOfCarriersViewModel: ObservableObject {
     @Published var carriers: [RouteCarrierStruct] = []
     @Published var isLoading = false
     @Published var error: Error?
+    @Published var filterArray: [String] = []
+    @Published var isShowWithTransfers: Bool? = nil
     
     private let isoFormatter = ISO8601DateFormatter()
+    
+    var filteredCarriers: [RouteCarrierStruct] {
+        carriers.filter { carrier in
+            let isTransfered = isShowWithTransfers ?? true ? true : !carrier.transferInfo
+            let timeFilter = filterArray.isEmpty || filterArray.contains { filterFunction(carrier: carrier).contains($0) }
+            return isTransfered && timeFilter
+        }
+    }
+    
+    var hasActiveFilters: Bool {
+        !filterArray.isEmpty || isShowWithTransfers != nil
+    }
     
     private var timeFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -40,7 +54,10 @@ final class ListOfCarriersViewModel: ObservableObject {
         error = nil
         
         do {
-            let schedule = try await DataNetworkService.shared.scheduleBetweenStations(fromStationCode: fromStationCode, toStationCode: toStationCode)
+            let schedule = try await DataNetworkService.shared.scheduleBetweenStations(
+                fromStationCode: fromStationCode,
+                toStationCode: toStationCode
+            )
             
             guard let segments = schedule.segments else {
                 carriers = []
@@ -79,5 +96,17 @@ final class ListOfCarriersViewModel: ObservableObject {
         }
         
         isLoading = false
+    }
+    
+    func filterFunction(carrier: RouteCarrierStruct) -> String {
+        guard let hour = Int(carrier.routeStartTime.prefix(2)) else { return "Ошибка конвертации времени" }
+        
+        switch hour {
+        case 6..<12: return "Утро 06:00 - 12:00"
+        case 12..<18: return "День 12:00 - 18:00"
+        case 18..<24: return "Вечер 18:00 - 00:00"
+        case 0..<6: return "Ночь 00:00 - 06:00"
+        default: return "Вне диапазона"
+        }
     }
 }
