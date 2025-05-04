@@ -5,7 +5,6 @@
 //  Created by Demain Petropavlov on 18.04.2025.
 //
 
-
 import SwiftUI
 
 struct CarriersCardView: View {
@@ -25,8 +24,8 @@ struct CarriersCardView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
                 // Логотип
-                if let logoURL = carrier.logoURL {
-                    AsyncImage(url: logoURL) { image in
+                if !carrier.logoURL.isEmpty, let url = URL(string: carrier.logoURL) {
+                    AsyncImage(url: url) { image in
                         image
                             .resizable()
                             .scaledToFit()
@@ -103,7 +102,7 @@ struct CarriersCardView: View {
     NavigationView {
         CarriersCardView(carrier: Carrier(
             name: "ОАО «РЖД»",
-            logoURL: URL(string: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/RZD.svg/2560px-RZD.svg.png"),
+            logoURL: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/RZD.svg/2560px-RZD.svg.png",
             email: "i.lozgkina@yandex.ru",
             phone: "+7 (904) 329-27-71"
         ))

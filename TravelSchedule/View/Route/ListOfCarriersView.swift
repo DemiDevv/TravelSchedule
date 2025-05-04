@@ -81,48 +81,48 @@ struct ListOfCarriersView: View {
 }
 
 // MARK: - Preview
-#Preview {
-    let mockRouteInfo = RouteInfo(
-        fromCity: City(name: "Москва", stations: [Station(name: "Ярославский вокзал")]),
-        fromStation: Station(name: "Ярославский вокзал"),
-        toCity: City(name: "Санкт-Петербург", stations: [Station(name: "Балтийский вокзал")]),
-        toStation: Station(name: "Балтийский вокзал")
-    )
-    
-    let calendar = Calendar.current
-    let now = Date()
-    
-    func createDate(day: Int, hour: Int, minute: Int) -> Date {
-        var components = calendar.dateComponents([.year, .month], from: now)
-        components.day = day
-        components.hour = hour
-        components.minute = minute
-        return calendar.date(from: components)!
-    }
-    
-    let mockTrains = [
-        TrainInfo(
-            companyName: "РЖД",
-            companyLogo: Image(systemName: "tram.fill"),
-            note: "Костроме",
-            date: createDate(day: 14, hour: 0, minute: 0),
-            departureTime: createDate(day: 14, hour: 22, minute: 30),
-            arrivalTime: createDate(day: 15, hour: 8, minute: 15),
-            duration: 20 * 3600
-        ),
-        TrainInfo(
-            companyName: "ФГК",
-            companyLogo: Image(systemName: "bolt.car.fill"),
-            note: nil,
-            date: createDate(day: 15, hour: 0, minute: 0),
-            departureTime: createDate(day: 15, hour: 1, minute: 15),
-            arrivalTime: createDate(day: 15, hour: 9, minute: 0),
-            duration: 9 * 3600
-        )
-    ]
-    
-    return ListOfCarriersView(
-        routeInfo: mockRouteInfo,
-        trains: mockTrains
-    )
-}
+//#Preview {
+//    let mockRouteInfo = RouteInfo(
+//        fromCity: City(name: "Москва", stations: [Station(name: "Ярославский вокзал")]),
+//        fromStation: Station(name: "Ярославский вокзал"),
+//        toCity: City(name: "Санкт-Петербург", stations: [Station(name: "Балтийский вокзал")]),
+//        toStation: Station(name: "Балтийский вокзал")
+//    )
+//    
+//    let calendar = Calendar.current
+//    let now = Date()
+//    
+//    func createDate(day: Int, hour: Int, minute: Int) -> Date {
+//        var components = calendar.dateComponents([.year, .month], from: now)
+//        components.day = day
+//        components.hour = hour
+//        components.minute = minute
+//        return calendar.date(from: components)!
+//    }
+//    
+//    let mockTrains = [
+//        TrainInfo(
+//            companyName: "РЖД",
+//            companyLogo: Image(systemName: "tram.fill"),
+//            note: "Костроме",
+//            date: createDate(day: 14, hour: 0, minute: 0),
+//            departureTime: createDate(day: 14, hour: 22, minute: 30),
+//            arrivalTime: createDate(day: 15, hour: 8, minute: 15),
+//            duration: 20 * 3600
+//        ),
+//        TrainInfo(
+//            companyName: "ФГК",
+//            companyLogo: Image(systemName: "bolt.car.fill"),
+//            note: nil,
+//            date: createDate(day: 15, hour: 0, minute: 0),
+//            departureTime: createDate(day: 15, hour: 1, minute: 15),
+//            arrivalTime: createDate(day: 15, hour: 9, minute: 0),
+//            duration: 9 * 3600
+//        )
+//    ]
+//    
+//    return ListOfCarriersView(
+//        routeInfo: mockRouteInfo,
+//        trains: mockTrains
+//    )
+//}

@@ -76,24 +76,24 @@ struct RouteInputFields: View {
 }
 
 // MARK: - Preview
-#Preview {
-    // Создаем моковый ViewModel для превью
-    let mockViewModel = RouteInputViewModel()
-    
-    // Создаем тестовые станции
-    let moscowStation = Station(name: "Москва")
-    let petersburgStation = Station(name: "Санкт-Петербург")
-    
-    // Настраиваем ViewModel
-    mockViewModel.fromStation = moscowStation
-    mockViewModel.toStation = petersburgStation
-    
-    // Создаем состояние для navigationPath
-    @State var navigationPath = NavigationPath()
-    
-    return RouteInputFields(
-        viewModel: mockViewModel,
-        navigationPath: $navigationPath
-    )
-    .padding()
-}
+//#Preview {
+//    // Создаем моковый ViewModel для превью
+//    let mockViewModel = RouteInputViewModel()
+//    
+//    // Создаем тестовые станции
+//    let moscowStation = Station(name: "Москва")
+//    let petersburgStation = Station(name: "Санкт-Петербург")
+//    
+//    // Настраиваем ViewModel
+//    mockViewModel.fromStation = moscowStation
+//    mockViewModel.toStation = petersburgStation
+//    
+//    // Создаем состояние для navigationPath
+//    @State var navigationPath = NavigationPath()
+//    
+//    return RouteInputFields(
+//        viewModel: mockViewModel,
+//        navigationPath: $navigationPath
+//    )
+//    .padding()
+//}

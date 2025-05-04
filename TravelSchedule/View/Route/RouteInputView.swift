@@ -12,14 +12,15 @@ struct RouteInputView: View {
     @StateObject private var storiesData = StoriesStabData.shared
     @State private var navigationPath = NavigationPath()
     @AppStorage(Constants.isDarkMode.stringValue) private var isDarkMode: Bool = false
+    @State private var showErrorAlert = false
+    @State private var errorMessage = ""
     
     var body: some View {
         NavigationStack(path: $navigationPath) {
             VStack(spacing: 0) {
-                
                 Spacer()
                     .frame(height: 24)
-                // Горизонтальная лента сторис
+                
                 StoriesHorizontalView(stories: $storiesData.stories) { story in
                     if let index = storiesData.stories.firstIndex(where: { $0.id == story.id }) {
                         storiesData.stories[index].isViewed = true
@@ -27,11 +28,9 @@ struct RouteInputView: View {
                     }
                 }
                 
-                // Отступ 44 между сторис и основным контентом
                 Spacer()
                     .frame(height: 44)
                 
-                // Основной контент
                 VStack(spacing: Constants.spacing) {
                     RouteInputFields(
                         viewModel: viewModel,
@@ -105,6 +104,30 @@ struct RouteInputView: View {
                 .navigationBarBackButtonHidden(true)
             }
             .navigationBarBackButtonHidden(true)
+            .overlay {
+                if viewModel.isLoading {
+                    ProgressView()
+                        .scaleEffect(1.5)
+                        .tint(.blueYP)
+                }
+            }
+            .alert("Ошибка", isPresented: $showErrorAlert) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(errorMessage)
+            }
+            .task {
+                await loadCities()
+            }
+        }
+    }
+    
+    private func loadCities() async {
+        do {
+            try await viewModel.loadCities()
+        } catch {
+            errorMessage = "Не удалось загрузить список городов и станций. Пожалуйста, проверьте подключение к интернету."
+            showErrorAlert = true
         }
     }
     
@@ -119,7 +142,6 @@ struct RouteInputView: View {
             components.minute = minute
             
             guard let date = calendar.date(from: components) else {
-                // Возвращаем nil или можно поставить дефолтную дату
                 return nil
             }
             return date
@@ -148,7 +170,6 @@ struct RouteInputView: View {
     }
 }
 
-// MARK: - Preview
 #Preview("Route Input View Preview") {
     RouteInputView()
         .environmentObject(StoriesStabData.shared)
