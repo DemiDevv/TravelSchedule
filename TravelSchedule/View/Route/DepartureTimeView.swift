@@ -100,3 +100,10 @@ struct DepartureTimeView: View {
         }
     }
 }
+
+//MARK: - Preview
+#Preview {
+    NavigationStack {
+        DepartureTimeView(viewModel: ListOfCarriersViewModel())
+    }
+}

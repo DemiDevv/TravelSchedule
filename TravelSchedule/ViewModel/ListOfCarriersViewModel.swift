@@ -14,7 +14,7 @@ import SwiftUI
 
 @MainActor
 final class ListOfCarriersViewModel: ObservableObject {
-    @Published var carriers: [RouteCarrierStruct] = []
+    @Published var carriers: [RouteCarrier] = []
     @Published var isLoading = false
     @Published var error: Error?
     @Published var filterArray: [String] = []
@@ -22,7 +22,7 @@ final class ListOfCarriersViewModel: ObservableObject {
     
     private let isoFormatter = ISO8601DateFormatter()
     
-    var filteredCarriers: [RouteCarrierStruct] {
+    var filteredCarriers: [RouteCarrier] {
         carriers.filter { carrier in
             let isTransfered = isShowWithTransfers ?? true ? true : !carrier.transferInfo
             let timeFilter = filterArray.isEmpty || filterArray.contains { filterFunction(carrier: carrier).contains($0) }
@@ -77,7 +77,7 @@ final class ListOfCarriersViewModel: ObservableObject {
                 let stopFormatted = stopTime.map { timeFormatter.string(from: $0) } ?? "N/A"
                 let routeDay = startTime.map { dateFormatter.string(from: $0) } ?? "N/A"
                 
-                return RouteCarrierStruct(
+                return RouteCarrier(
                     carrierImage: carrier.logo ?? "",
                     carrierName: carrier.title ?? "Неизвестный перевозчик",
                     transferInfo: segment.has_transfers ?? false,
@@ -98,7 +98,7 @@ final class ListOfCarriersViewModel: ObservableObject {
         isLoading = false
     }
     
-    func filterFunction(carrier: RouteCarrierStruct) -> String {
+    func filterFunction(carrier: RouteCarrier) -> String {
         guard let hour = Int(carrier.routeStartTime.prefix(2)) else { return "Ошибка конвертации времени" }
         
         switch hour {

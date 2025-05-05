@@ -124,7 +124,7 @@ struct ListOfCarriersView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
     
-    private func convertToTrainInfo(carrier: RouteCarrierStruct) -> TrainInfo {
+    private func convertToTrainInfo(carrier: RouteCarrier) -> TrainInfo {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "d MMMM"
         dateFormatter.locale = Locale(identifier: "ru_RU")
@@ -162,5 +162,31 @@ struct ListOfCarriersView: View {
             arrivalTime: arrivalDate,
             duration: TimeInterval(durationHours * 3600)
         )
+    }
+}
+
+//MARK: - Preview
+#Preview {
+    let moscow = City(name: "Москва", stations: [
+        Station(name: "Киевский вокзал", code: "KV"),
+        Station(name: "Курский вокзал", code: "KR"),
+        Station(name: "Ярославский вокзал", code: "YAR")
+    ])
+    
+    let petersburg = City(name: "Санкт-Петербург", stations: [
+        Station(name: "Балтийский вокзал", code: "SPB-BAL"),
+        Station(name: "Московский вокзал", code: "SPB-MOS"),
+        Station(name: "Финляндский вокзал", code: "SPB-FIN")
+    ])
+    
+    let routeInfo = RouteInfo(
+        fromCity: moscow,
+        fromStation: moscow.stations[0],
+        toCity: petersburg,
+        toStation: petersburg.stations[1]
+    )
+    
+    return NavigationStack {
+        ListOfCarriersView(routeInfo: routeInfo)
     }
 }

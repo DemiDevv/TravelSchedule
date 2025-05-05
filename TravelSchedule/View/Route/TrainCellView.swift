@@ -32,7 +32,7 @@ struct TrainCellView: View {
     
     var body: some View {
         ZStack {
-            isDarkMode ? Color.whiteYP : Color(.systemGray6)
+            isDarkMode ? Color.whiteYP : Color(.lightGrayYP)
             
             VStack(spacing: 16) {
                 HStack(alignment: .top) {
@@ -67,7 +67,7 @@ struct TrainCellView: View {
                             
                             Text(dateFormatter.string(from: train.date))
                                 .font(.system(size: 12))
-                                .foregroundColor(isDarkMode ? .gray : .secondary)
+                                .foregroundColor(isDarkMode ? .lightGrayYP : .secondary)
                         }
                         
                         if let note = train.note {
@@ -108,5 +108,33 @@ struct TrainCellView: View {
         }
         .frame(height: 104)
         .clipShape(RoundedRectangle(cornerRadius: 20))
+    }
+}
+
+//MARK: - Preview
+#Preview {
+    Group {
+        TrainCellView(train: TrainInfo(
+            companyName: "РЖД",
+            companyLogoURL: "https://example.com/logo.png",
+            note: "С пересадкой",
+            date: Date(),
+            departureTime: Date(),
+            arrivalTime: Date().addingTimeInterval(3600 * 4),
+            duration: 3600 * 4
+        ))
+        .padding()
+        
+        TrainCellView(train: TrainInfo(
+            companyName: "Аэроэкспресс",
+            companyLogoURL: nil,
+            note: nil,
+            date: Date(),
+            departureTime: Date(),
+            arrivalTime: Date().addingTimeInterval(3600 * 2),
+            duration: 3600 * 2
+        ))
+        .padding()
+        .preferredColorScheme(.light)
     }
 }

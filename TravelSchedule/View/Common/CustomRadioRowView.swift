@@ -30,3 +30,25 @@ struct CustomRadioRow: View {
         .buttonStyle(PlainButtonStyle())
     }
 }
+
+//MARK: - Preview
+#Preview {
+    Group {
+        CustomRadioRow(
+            title: "Пример радио-кнопки",
+            isSelected: true,
+            isDarkMode: false,
+            action: {}
+        )
+        .padding()
+        
+        CustomRadioRow(
+            title: "Пример радио-кнопки (темная тема)",
+            isSelected: false,
+            isDarkMode: true,
+            action: {}
+        )
+        .padding()
+        .background(Color.black)
+    }
+}

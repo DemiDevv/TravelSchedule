@@ -8,6 +8,7 @@
 import Foundation
 import Combine
 
+@MainActor
 final class ChoiceStationViewModel: ObservableObject {
     let city: City
     @Published var searchText = ""

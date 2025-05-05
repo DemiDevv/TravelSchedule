@@ -94,3 +94,15 @@ struct CarriersCardView: View {
         .navigationBarTitleDisplayMode(.inline)
     }
 }
+
+//MARK: - Preview
+#Preview {
+    NavigationStack {
+        CarriersCardView(carrier: Carrier(
+            name: "РЖД",
+            logoURL: "https://example.com/logo.png",
+            email: "contact@rzd.ru",
+            phone: "+7 (800) 775-00-00"
+        ))
+    }
+}

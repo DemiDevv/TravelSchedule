@@ -5,12 +5,10 @@
 //  Created by Demain Petropavlov on 18.03.2025.
 //
 
-// 1. Импортируем библиотеки
 import OpenAPIRuntime
 import OpenAPIURLSession
 import Foundation
 
-// 2. Улучшаем читаемость кода — необязательный шаг
 typealias NearestStations = Components.Schemas.Stations
 typealias TwoStationSchedule = Components.Schemas.Segments
 typealias OneStationSchedule = Components.Schemas.ScheduleResponse
@@ -45,7 +43,7 @@ final class TravelNetworkService: TravelNetworkServiceProtocol {
     // MARK: Расписание рейсов между станциями
     func GetScheduleBetweenStations(from: String, to: String) async throws -> TwoStationSchedule {
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd" // Указываем нужный формат
+        dateFormatter.dateFormat = "yyyy-MM-dd"
         let dateString = dateFormatter.string(from: Date())
 
         let response = try await client.getScheduleBetweenStations(query: .init(

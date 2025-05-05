@@ -76,7 +76,7 @@ struct DataNetworkService {
             let carrierInfo = try await service.GetCarrierInfo(code: code)
             let jsonData = try JSONSerialization.data(withJSONObject: carrierInfo.carrier?.value as? [String: Any], options: [])
             let decoder = JSONDecoder()
-            let carrierResponse = try decoder.decode(CarrierResponseStruct.self, from: jsonData)
+            let carrierResponse = try decoder.decode(CarrierResponse.self, from: jsonData)
             let carrierList = Carrier(name: carrierResponse.title ?? "", logoURL: "RZD", email: carrierResponse.email ?? "", phone: carrierResponse.phone ?? "")
             return carrierList
         } catch {
