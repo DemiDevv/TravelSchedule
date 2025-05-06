@@ -77,7 +77,7 @@ struct RouteInputFields: View {
 
 // MARK: - Preview
 #Preview {
-    @State var navigationPath = NavigationPath()
+    @Previewable @State var navigationPath = NavigationPath()
     
     return RouteInputFields(
         viewModel: RouteInputViewModel(),

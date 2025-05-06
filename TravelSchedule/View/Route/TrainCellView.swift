@@ -32,30 +32,32 @@ struct TrainCellView: View {
     
     var body: some View {
         ZStack {
-            isDarkMode ? Color.whiteYP : Color(.lightGrayYP)
+            Color.lightGrayYP
             
             VStack(spacing: 16) {
                 HStack(alignment: .top) {
-                    if let urlString = train.companyLogoURL, let url = URL(string: urlString) {
-                        AsyncImage(url: url) { image in
-                            image
+                    Group {
+                        if let urlString = train.companyLogoURL, let url = URL(string: urlString) {
+                            AsyncImage(url: url) { image in
+                                image
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 38, height: 38)
+                                    .clipped()
+                            } placeholder: {
+                                ProgressView()
+                                    .frame(width: 38, height: 38)
+                            }
+                        } else {
+                            Image(systemName: "tram.fill")
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 38, height: 38)
-                                .padding(.leading, 8)
-                        } placeholder: {
-                            ProgressView()
-                                .frame(width: 38, height: 38)
-                                .padding(.leading, 8)
+                                .foregroundColor(isDarkMode ? .blackYP : .primary)
                         }
-                    } else {
-                        Image(systemName: "tram.fill")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 38, height: 38)
-                            .padding(.leading, 8)
-                            .foregroundColor(isDarkMode ? .blackYP : .primary)
                     }
+                    .frame(width: 38, height: 38)
+                    .padding(.leading, 8)
                     
                     VStack(alignment: .leading, spacing: 4) {
                         HStack {
@@ -67,7 +69,7 @@ struct TrainCellView: View {
                             
                             Text(dateFormatter.string(from: train.date))
                                 .font(.system(size: 12))
-                                .foregroundColor(isDarkMode ? .lightGrayYP : .secondary)
+                                .foregroundColor(isDarkMode ? .blackYP : .secondary)
                         }
                         
                         if let note = train.note {
@@ -91,7 +93,7 @@ struct TrainCellView: View {
                     
                     Text(formatDuration(train.duration))
                         .font(.system(size: 12))
-                        .foregroundColor(isDarkMode ? .gray : .secondary)
+                        .foregroundColor(.blackYP)
                     
                     Rectangle()
                         .fill(isDarkMode ? Color.gray : Color.gray.opacity(0.5))

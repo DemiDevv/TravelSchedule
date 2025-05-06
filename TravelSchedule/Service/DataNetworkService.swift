@@ -8,6 +8,10 @@
 import SwiftUI
 import OpenAPIURLSession
 
+enum SomeError: Error {
+    case invalidCarrierData
+}
+
 struct DataNetworkService {
     @MainActor static let shared = DataNetworkService()
     
@@ -74,7 +78,10 @@ struct DataNetworkService {
     func carrierInfo(code: String) async throws -> Carrier {
         do {
             let carrierInfo = try await service.GetCarrierInfo(code: code)
-            let jsonData = try JSONSerialization.data(withJSONObject: carrierInfo.carrier?.value as? [String: Any], options: [])
+            guard let carrierDict = carrierInfo.carrier?.value as? [String: Any] else {
+                throw SomeError.invalidCarrierData
+            }
+            let jsonData = try JSONSerialization.data(withJSONObject: carrierDict, options: [])
             let decoder = JSONDecoder()
             let carrierResponse = try decoder.decode(CarrierResponse.self, from: jsonData)
             let carrierList = Carrier(name: carrierResponse.title ?? "", logoURL: "RZD", email: carrierResponse.email ?? "", phone: carrierResponse.phone ?? "")

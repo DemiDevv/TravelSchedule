@@ -101,21 +101,28 @@ struct ChoiceStationView: View {
 
 // MARK: - Preview
 #Preview {
-    let city = City(name: "Москва", stations: [
-        Station(name: "Киевский вокзал", code: ""),
-        Station(name: "Курский вокзал", code: ""),
-        Station(name: "Ярославский вокзал", code: "")
-    ])
-    
-    @State var selectedStation: Station? = nil
-    @State var navigationPath = NavigationPath()
-    
-    NavigationStack {
-        ChoiceStationView(
-            city: city,
-            isFromField: true,
-            selectedStation: $selectedStation,
-            navigationPath: $navigationPath
-        )
+    PreviewWrapper()
+}
+
+private struct PreviewWrapper: View {
+    @State private var selectedStation: Station? = nil
+    @State private var navigationPath = NavigationPath()
+
+    var body: some View {
+        let city = City(name: "Москва", stations: [
+            Station(name: "Киевский вокзал", code: ""),
+            Station(name: "Курский вокзал", code: ""),
+            Station(name: "Ярославский вокзал", code: "")
+        ])
+        
+        return NavigationStack(path: $navigationPath) {
+            ChoiceStationView(
+                city: city,
+                isFromField: true,
+                selectedStation: $selectedStation,
+                navigationPath: $navigationPath
+            )
+        }
     }
 }
+

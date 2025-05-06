@@ -8,18 +8,20 @@
 import Network
 import Combine
 
+@MainActor
 class NetworkMonitor: ObservableObject {
     private let monitor = NWPathMonitor()
     private let queue = DispatchQueue(label: "NetworkMonitorQueue")
-    
+
     @Published var isConnected: Bool = true
-    
+
     init() {
         monitor.pathUpdateHandler = { [weak self] path in
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 self?.isConnected = (path.status == .satisfied)
             }
         }
         monitor.start(queue: queue)
     }
 }
+

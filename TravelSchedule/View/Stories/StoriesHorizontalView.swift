@@ -29,7 +29,7 @@ struct StoriesHorizontalView: View {
 
 // MARK: - Preview
 #Preview("Stories Horizontal View Preview") {
-    @State var stories = StoriesStabData.shared.stories
+    @Previewable @State var stories = StoriesStabData.shared.stories
     
     return StoriesHorizontalView(stories: $stories) { story in
         print("Tapped on story: \(story.title)")
