@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Kingfisher
 
 struct TrainCellView: View {
     let train: TrainInfo
@@ -38,16 +39,17 @@ struct TrainCellView: View {
                 HStack(alignment: .top) {
                     Group {
                         if let urlString = train.companyLogoURL, let url = URL(string: urlString) {
-                            AsyncImage(url: url) { image in
-                                image
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 38, height: 38)
-                                    .clipped()
-                            } placeholder: {
-                                ProgressView()
-                                    .frame(width: 38, height: 38)
-                            }
+                            KFImage(url)
+                                .placeholder {
+                                    Image(systemName: "tram.fill")
+                                        .resizable()
+                                        .scaledToFill()
+                                        .foregroundColor(isDarkMode ? .blackYP : .primary)
+                                }
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 38, height: 38)
+                                .clipShape(RoundedRectangle(cornerRadius: 12))
                         } else {
                             Image(systemName: "tram.fill")
                                 .resizable()
@@ -80,6 +82,7 @@ struct TrainCellView: View {
                     }
                     .padding(.trailing, 8)
                 }
+
                 
                 HStack {
                     Text(timeFormatter.string(from: train.departureTime))
