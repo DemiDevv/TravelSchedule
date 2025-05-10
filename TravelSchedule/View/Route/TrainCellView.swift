@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Kingfisher
 
 struct TrainCellView: View {
     let train: TrainInfo
@@ -32,16 +33,33 @@ struct TrainCellView: View {
     
     var body: some View {
         ZStack {
-            isDarkMode ? Color.whiteYP : Color(.systemGray6)
+            Color.lightGrayYP
             
             VStack(spacing: 16) {
                 HStack(alignment: .top) {
-                    train.companyLogo
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 38, height: 38)
-                        .padding(.leading, 8)
-                        .foregroundColor(isDarkMode ? .blackYP : .primary)
+                    Group {
+                        if let urlString = train.companyLogoURL, let url = URL(string: urlString) {
+                            KFImage(url)
+                                .placeholder {
+                                    Image(systemName: "tram.fill")
+                                        .resizable()
+                                        .scaledToFill()
+                                        .foregroundColor(isDarkMode ? .blackYP : .primary)
+                                }
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 38, height: 38)
+                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                        } else {
+                            Image(systemName: "tram.fill")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 38, height: 38)
+                                .foregroundColor(isDarkMode ? .blackYP : .primary)
+                        }
+                    }
+                    .frame(width: 38, height: 38)
+                    .padding(.leading, 8)
                     
                     VStack(alignment: .leading, spacing: 4) {
                         HStack {
@@ -53,17 +71,18 @@ struct TrainCellView: View {
                             
                             Text(dateFormatter.string(from: train.date))
                                 .font(.system(size: 12))
-                                .foregroundColor(isDarkMode ? .gray : .secondary)
+                                .foregroundColor(isDarkMode ? .blackYP : .secondary)
                         }
                         
                         if let note = train.note {
-                            Text("С пересадкой в \(note)")
+                            Text(note)
                                 .font(.system(size: 12))
                                 .foregroundColor(.redYP)
                         }
                     }
                     .padding(.trailing, 8)
                 }
+
                 
                 HStack {
                     Text(timeFormatter.string(from: train.departureTime))
@@ -77,7 +96,7 @@ struct TrainCellView: View {
                     
                     Text(formatDuration(train.duration))
                         .font(.system(size: 12))
-                        .foregroundColor(isDarkMode ? .gray : .secondary)
+                        .foregroundColor(.blackYP)
                     
                     Rectangle()
                         .fill(isDarkMode ? Color.gray : Color.gray.opacity(0.5))
@@ -97,16 +116,30 @@ struct TrainCellView: View {
     }
 }
 
-// MARK: - Preview
+//MARK: - Preview
 #Preview {
-    let sampleTrain = TrainInfo(
-        companyName: "РЖД",
-        companyLogo: Image(systemName: "train.side.front.car"),
-        note: "Костроме",
-        date: Date(),
-        departureTime: Date(),
-        arrivalTime: Date().addingTimeInterval(3600 * 5 + 60 * 30), // 5 часов 30 минут
-        duration: 3600 * 5 + 60 * 30
-    )
-        TrainCellView(train: sampleTrain)
+    Group {
+        TrainCellView(train: TrainInfo(
+            companyName: "РЖД",
+            companyLogoURL: "https://example.com/logo.png",
+            note: "С пересадкой",
+            date: Date(),
+            departureTime: Date(),
+            arrivalTime: Date().addingTimeInterval(3600 * 4),
+            duration: 3600 * 4
+        ))
+        .padding()
+        
+        TrainCellView(train: TrainInfo(
+            companyName: "Аэроэкспресс",
+            companyLogoURL: nil,
+            note: nil,
+            date: Date(),
+            departureTime: Date(),
+            arrivalTime: Date().addingTimeInterval(3600 * 2),
+            duration: 3600 * 2
+        ))
+        .padding()
+        .preferredColorScheme(.light)
+    }
 }

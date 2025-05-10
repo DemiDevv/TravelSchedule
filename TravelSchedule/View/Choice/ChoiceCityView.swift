@@ -77,7 +77,9 @@ struct ChoiceCityView: View {
         VStack(spacing: 0) {
             searchBar
             
-            if viewModel.filteredCities.isEmpty {
+            if viewModel.allCities.isEmpty {
+                ErrorView(errors: .noInternet)
+            } else if viewModel.filteredCities.isEmpty {
                 if viewModel.searchText.isEmpty {
                     ErrorView(errors: .noInternet)
                 } else {
@@ -105,7 +107,6 @@ struct ChoiceCityView: View {
     }
 }
 
-// MARK: - Preview
 #Preview {
     ChoiceCityView(
         isFromField: false,

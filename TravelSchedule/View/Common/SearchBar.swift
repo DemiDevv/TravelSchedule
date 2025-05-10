@@ -49,3 +49,22 @@ struct SearchBar: View {
         .cornerRadius(12)
     }
 }
+
+#Preview {
+    struct SearchBarPreview: View {
+        @State private var searchText = ""
+        @State private var isSearching = false
+        
+        var body: some View {
+            VStack {
+                SearchBar(text: $searchText, isSearching: $isSearching)
+                    .padding()
+                
+                Text("Current text: \(searchText)")
+                Text("Is searching: \(isSearching.description)")
+            }
+        }
+    }
+    
+    return SearchBarPreview()
+}

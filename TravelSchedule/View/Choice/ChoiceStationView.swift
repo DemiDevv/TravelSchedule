@@ -100,22 +100,22 @@ struct ChoiceStationView: View {
 }
 
 // MARK: - Preview
-struct ChoiceStationView_Previews: PreviewProvider {
-    static let testCity = City(
-        name: "Москва",
-        stations: [
-            Station(name: "Курский вокзал"),
-            Station(name: "Ленинградский вокзал"),
-            Station(name: "Ярославский вокзал")
-        ]
-    )
-    
-    struct PreviewWrapper: View {
-        let city: City
-        @State private var selectedStation: Station? = nil
-        @State private var navigationPath = NavigationPath()
+#Preview {
+    PreviewWrapper()
+}
+
+private struct PreviewWrapper: View {
+    @State private var selectedStation: Station? = nil
+    @State private var navigationPath = NavigationPath()
+
+    var body: some View {
+        let city = City(name: "Москва", stations: [
+            Station(name: "Киевский вокзал", code: ""),
+            Station(name: "Курский вокзал", code: ""),
+            Station(name: "Ярославский вокзал", code: "")
+        ])
         
-        var body: some View {
+        return NavigationStack(path: $navigationPath) {
             ChoiceStationView(
                 city: city,
                 isFromField: true,
@@ -124,12 +124,5 @@ struct ChoiceStationView_Previews: PreviewProvider {
             )
         }
     }
-    static var previews: some View {
-            ChoiceStationView(
-                city: testCity,
-                isFromField: false,
-                selectedStation: .constant(nil),
-                navigationPath: .constant(NavigationPath())
-            )
-    }
 }
+

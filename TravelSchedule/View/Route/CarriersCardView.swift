@@ -5,12 +5,11 @@
 //  Created by Demain Petropavlov on 18.04.2025.
 //
 
-
 import SwiftUI
 
 struct CarriersCardView: View {
     let carrier: Carrier
-    
+    @Environment(\.dismiss) private var dismiss
     @AppStorage(Constants.isDarkMode.stringValue) private var isDarkMode: Bool = false
     
     private var backgroundColor: Color {
@@ -24,9 +23,8 @@ struct CarriersCardView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
-                // Логотип
-                if let logoURL = carrier.logoURL {
-                    AsyncImage(url: logoURL) { image in
+                if !carrier.logoURL.isEmpty, let url = URL(string: carrier.logoURL) {
+                    AsyncImage(url: url) { image in
                         image
                             .resizable()
                             .scaledToFit()
@@ -44,7 +42,6 @@ struct CarriersCardView: View {
                     .padding(.top, 16)
                 }
                 
-                // Контент
                 VStack(alignment: .leading, spacing: 16) {
                     Text(carrier.name)
                         .font(.system(size: 20, weight: .bold))
@@ -86,7 +83,7 @@ struct CarriersCardView: View {
             
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: {
-                    // Навигация назад
+                    dismiss()
                 }) {
                     Image(systemName: "chevron.left")
                         .font(.system(size: 17, weight: .medium))
@@ -98,14 +95,14 @@ struct CarriersCardView: View {
     }
 }
 
-// MARK: - Preview
+//MARK: - Preview
 #Preview {
-    NavigationView {
+    NavigationStack {
         CarriersCardView(carrier: Carrier(
-            name: "ОАО «РЖД»",
-            logoURL: URL(string: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/RZD.svg/2560px-RZD.svg.png"),
-            email: "i.lozgkina@yandex.ru",
-            phone: "+7 (904) 329-27-71"
+            name: "РЖД",
+            logoURL: "https://example.com/logo.png",
+            email: "contact@rzd.ru",
+            phone: "+7 (800) 775-00-00"
         ))
     }
 }

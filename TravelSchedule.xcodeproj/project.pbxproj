@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		30B9A6C02D82F65C00F6069E /* OpenAPIRuntime in Frameworks */ = {isa = PBXBuildFile; productRef = 30B9A6BF2D82F65C00F6069E /* OpenAPIRuntime */; };
 		30B9A6C32D82F67300F6069E /* OpenAPIURLSession in Frameworks */ = {isa = PBXBuildFile; productRef = 30B9A6C22D82F67300F6069E /* OpenAPIURLSession */; };
+		30F4C7B72DCA090D00CC9C21 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 30F4C7B62DCA090D00CC9C21 /* Kingfisher */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				30F4C7B72DCA090D00CC9C21 /* Kingfisher in Frameworks */,
 				30B9A6C02D82F65C00F6069E /* OpenAPIRuntime in Frameworks */,
 				30B9A6C32D82F67300F6069E /* OpenAPIURLSession in Frameworks */,
 			);
@@ -75,6 +77,7 @@
 			packageProductDependencies = (
 				30B9A6BF2D82F65C00F6069E /* OpenAPIRuntime */,
 				30B9A6C22D82F67300F6069E /* OpenAPIURLSession */,
+				30F4C7B62DCA090D00CC9C21 /* Kingfisher */,
 			);
 			productName = TravelSchedule;
 			productReference = 30B71FBF2D82EA9A00B221FC /* TravelSchedule.app */;
@@ -108,6 +111,7 @@
 				30B9A6BE2D82F65C00F6069E /* XCRemoteSwiftPackageReference "swift-openapi-runtime" */,
 				30B9A6C12D82F67300F6069E /* XCRemoteSwiftPackageReference "swift-openapi-urlsession" */,
 				30B9A6C42D82F72F00F6069E /* XCRemoteSwiftPackageReference "swift-openapi-generator" */,
+				30F4C7B52DCA090D00CC9C21 /* XCRemoteSwiftPackageReference "Kingfisher" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 30B71FC02D82EA9A00B221FC /* Products */;
@@ -294,6 +298,7 @@
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
@@ -327,6 +332,7 @@
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
@@ -380,6 +386,14 @@
 				minimumVersion = 1.7.1;
 			};
 		};
+		30F4C7B52DCA090D00CC9C21 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.3.2;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -397,6 +411,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 30B9A6C42D82F72F00F6069E /* XCRemoteSwiftPackageReference "swift-openapi-generator" */;
 			productName = "plugin:OpenAPIGenerator";
+		};
+		30F4C7B62DCA090D00CC9C21 /* Kingfisher */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 30F4C7B52DCA090D00CC9C21 /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			productName = Kingfisher;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -30,3 +30,25 @@ struct CustomCheckboxRow: View {
         .buttonStyle(PlainButtonStyle())
     }
 }
+
+//MARK: - Preview
+#Preview {
+    Group {
+        CustomCheckboxRow(
+            title: "Пример чекбокса",
+            isSelected: true,
+            isDarkMode: false,
+            action: {}
+        )
+        .padding()
+        
+        CustomCheckboxRow(
+            title: "Пример чекбокса (темная тема)",
+            isSelected: false,
+            isDarkMode: true,
+            action: {}
+        )
+        .padding()
+        .background(.blackYP)
+    }
+}

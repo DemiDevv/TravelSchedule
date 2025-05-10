@@ -12,14 +12,15 @@ struct RouteInputView: View {
     @StateObject private var storiesData = StoriesStabData.shared
     @State private var navigationPath = NavigationPath()
     @AppStorage(Constants.isDarkMode.stringValue) private var isDarkMode: Bool = false
+    @State private var showErrorAlert = false
+    @State private var errorMessage = ""
     
     var body: some View {
         NavigationStack(path: $navigationPath) {
             VStack(spacing: 0) {
-                
                 Spacer()
                     .frame(height: 24)
-                // Горизонтальная лента сторис
+                
                 StoriesHorizontalView(stories: $storiesData.stories) { story in
                     if let index = storiesData.stories.firstIndex(where: { $0.id == story.id }) {
                         storiesData.stories[index].isViewed = true
@@ -27,11 +28,9 @@ struct RouteInputView: View {
                     }
                 }
                 
-                // Отступ 44 между сторис и основным контентом
                 Spacer()
                     .frame(height: 44)
                 
-                // Основной контент
                 VStack(spacing: Constants.spacing) {
                     RouteInputFields(
                         viewModel: viewModel,
@@ -85,10 +84,7 @@ struct RouteInputView: View {
                 }
             }
             .navigationDestination(for: RouteInfo.self) { routeInfo in
-                ListOfCarriersView(
-                    routeInfo: routeInfo,
-                    trains: mockTrains(for: routeInfo)
-                )
+                ListOfCarriersView(routeInfo: routeInfo)
             }
             .navigationDestination(for: Story.self) { story in
                 ZStack(alignment: .topTrailing) {
@@ -105,50 +101,34 @@ struct RouteInputView: View {
                 .navigationBarBackButtonHidden(true)
             }
             .navigationBarBackButtonHidden(true)
+            .overlay {
+                if viewModel.isLoading {
+                    ProgressView()
+                        .scaleEffect(1.5)
+                        .tint(.blueYP)
+                }
+            }
+            .alert("Ошибка", isPresented: $showErrorAlert) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(errorMessage)
+            }
+            .task {
+                await loadCities()
+            }
         }
     }
     
-    private func mockTrains(for routeInfo: RouteInfo) -> [TrainInfo] {
-        let calendar = Calendar.current
-        let now = Date()
-        
-        func createDate(day: Int, hour: Int, minute: Int) -> Date? {
-            var components = calendar.dateComponents([.year, .month], from: now)
-            components.day = day
-            components.hour = hour
-            components.minute = minute
-            
-            guard let date = calendar.date(from: components) else {
-                // Возвращаем nil или можно поставить дефолтную дату
-                return nil
-            }
-            return date
+    private func loadCities() async {
+        do {
+            try await viewModel.loadCities()
+        } catch {
+            errorMessage = "Не удалось загрузить список городов и станций. Пожалуйста, проверьте подключение к интернету."
+            showErrorAlert = true
         }
-        
-        return [
-            TrainInfo(
-                companyName: "РЖД",
-                companyLogo: Image(systemName: "tram.fill"),
-                note: "Костроме",
-                date: createDate(day: 14, hour: 0, minute: 0) ?? Date(),
-                departureTime: createDate(day: 14, hour: 22, minute: 30) ?? Date(),
-                arrivalTime: createDate(day: 15, hour: 8, minute: 15) ?? Date(),
-                duration: 20 * 3600
-            ),
-            TrainInfo(
-                companyName: "ФГК",
-                companyLogo: Image(systemName: "bolt.car.fill"),
-                note: nil,
-                date: createDate(day: 15, hour: 0, minute: 0) ?? Date(),
-                departureTime: createDate(day: 15, hour: 1, minute: 15) ?? Date(),
-                arrivalTime: createDate(day: 15, hour: 9, minute: 0) ?? Date(),
-                duration: 9 * 3600
-            )
-        ]
     }
 }
 
-// MARK: - Preview
 #Preview("Route Input View Preview") {
     RouteInputView()
         .environmentObject(StoriesStabData.shared)

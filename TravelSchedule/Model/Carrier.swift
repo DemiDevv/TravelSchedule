@@ -10,7 +10,7 @@ import SwiftUI
 struct Carrier: Identifiable {
     let id: UUID = UUID()
     let name: String
-    let logoURL: URL?
+    let logoURL: String
     let email: String
     let phone: String
 }

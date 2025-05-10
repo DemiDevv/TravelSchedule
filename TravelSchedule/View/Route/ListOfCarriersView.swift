@@ -9,120 +9,184 @@ import SwiftUI
 
 struct ListOfCarriersView: View {
     let routeInfo: RouteInfo
-    let trains: [TrainInfo]
+    @StateObject private var viewModel = ListOfCarriersViewModel()
     
     @AppStorage(Constants.isDarkMode.stringValue) private var isDarkMode: Bool = false
     @State private var showingDepartureTimeView = false
     @Environment(\.dismiss) private var dismiss
     
     private var routeTitle: String {
-        let fromText = "\(routeInfo.fromCity?.name ?? "") (\(routeInfo.fromStation?.name ?? ""))"
-        let toText = "\(routeInfo.toCity?.name ?? "") (\(routeInfo.toStation?.name ?? ""))"
+        let fromText = "\(routeInfo.fromStation?.name ?? "")"
+        let toText = "\(routeInfo.toStation?.name ?? "")"
         return "\(fromText) → \(toText)"
     }
     
     var body: some View {
-        contentView
-            .navigationBarBackButtonHidden(true)
-            .navigationDestination(isPresented: $showingDepartureTimeView) {
-                DepartureTimeView()
-                    .navigationBarBackButtonHidden(true)
-            }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: {
-                        dismiss()
-                    }) {
-                        Image(systemName: "chevron.left")
-                            .foregroundColor(isDarkMode ? .white : .black)
-                            .font(.system(size: 22, weight: .medium))
-                    }
+        ZStack {
+            // Основной фон на весь экран
+            Color(isDarkMode ? .blackYP : .white)
+                .ignoresSafeArea()
+            
+            contentView
+        }
+        .navigationBarBackButtonHidden(true)
+        .navigationDestination(isPresented: $showingDepartureTimeView) {
+            DepartureTimeView(viewModel: viewModel)
+                .navigationBarBackButtonHidden(true)
+        }
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: {
+                    dismiss()
+                }) {
+                    Image(systemName: "chevron.left")
+                        .foregroundColor(isDarkMode ? .white : .black)
+                        .font(.system(size: 22, weight: .medium))
                 }
             }
+        }
+        .onAppear {
+            Task {
+                await viewModel.loadCarriers(
+                    fromStationCode: routeInfo.fromStation?.code ?? "",
+                    toStationCode: routeInfo.toStation?.code ?? ""
+                )
+            }
+        }
     }
     
     private var contentView: some View {
         VStack(alignment: .leading, spacing: 16) {
+            // Заголовок с фиксированным позиционированием
             Text(routeTitle)
                 .font(.system(size: 24, weight: .bold))
                 .foregroundColor(isDarkMode ? .whiteYP : .black)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.top, 16)
+                .fixedSize(horizontal: false, vertical: true)
             
-            if trains.isEmpty {
-                Spacer()
-                Text("Вариантов нет")
-                    .font(.system(size: 24, weight: .bold))
-                    .foregroundColor(isDarkMode ? .whiteYP : .black)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                Spacer()
-            } else {
-                ScrollView {
-                    VStack(spacing: 12) {
-                        ForEach(trains) { train in
-                            TrainCellView(train: train)
+            // Контентная область
+            Group {
+                if viewModel.isLoading {
+                    ProgressView()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .padding(.vertical, 50)
+                } else if viewModel.filteredCarriers.isEmpty {
+                    VStack {
+                        Spacer()
+                        Text(viewModel.error == nil ? "Вариантов нет" : "Ошибка загрузки")
+                            .font(.system(size: 24, weight: .bold))
+                            .foregroundColor(isDarkMode ? .whiteYP : .black)
+                        Spacer()
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else {
+                    ScrollView {
+                        VStack(spacing: 12) {
+                            ForEach(viewModel.filteredCarriers) { carrier in
+                                NavigationLink(destination: CarriersCardView(carrier: Carrier(
+                                    name: carrier.carrierName,
+                                    logoURL: carrier.carrierImage,
+                                    email: carrier.carrierMail,
+                                    phone: carrier.carrierPhone
+                                ))) {
+                                    TrainCellView(train: convertToTrainInfo(carrier: carrier))
+                                }
+                            }
                         }
+                        .padding(.bottom, 16)
                     }
                 }
             }
-
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            
+            // Кнопка внизу экрана
             Button(action: { showingDepartureTimeView = true }) {
-                Text("Уточнить время")
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                HStack(spacing: 8) {
+                    Text("Уточнить время")
+                        .font(.system(size: 17, weight: .bold))
+                    
+                    if viewModel.hasActiveFilters {
+                        Circle()
+                            .fill(Color.redYP)
+                            .frame(width: 8, height: 8)
+                    }
+                }
+                .foregroundColor(.whiteYP)
+                .frame(maxWidth: .infinity)
+                .frame(height: 60)
+                .background(Color.blueYP)
+                .cornerRadius(16)
             }
-            .frame(height: 60)
-            .background(Color.blueYP)
-            .cornerRadius(16)
-            .padding(.top, 8)
+            .padding(.bottom, 16)
         }
-        .padding(16) // ВАЖНО: отступ от ВСЕХ краёв
-        .background(isDarkMode ? Color.blackYP : Color.white)
+        .padding(.horizontal, 16)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+    
+    private func convertToTrainInfo(carrier: RouteCarrier) -> TrainInfo {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "d MMMM"
+        dateFormatter.locale = Locale(identifier: "ru_RU")
+        
+        let timeFormatter = DateFormatter()
+        timeFormatter.dateFormat = "HH:mm"
+        
+        let baseDate = Date()
+        
+        let departureComponents = carrier.routeStartTime.components(separatedBy: ":")
+        let departureHour = Int(departureComponents.first ?? "0") ?? 0
+        let departureMinute = Int(departureComponents.last ?? "0") ?? 0
+        
+        let durationHours = Int(carrier.routeDuration.components(separatedBy: " ").first ?? "0") ?? 0
+        
+        let departureDate = Calendar.current.date(
+            bySettingHour: departureHour,
+            minute: departureMinute,
+            second: 0,
+            of: baseDate
+        ) ?? baseDate
+        
+        let arrivalDate = Calendar.current.date(
+            byAdding: .hour,
+            value: durationHours,
+            to: departureDate
+        ) ?? baseDate
+        
+        return TrainInfo(
+            companyName: carrier.carrierName,
+            companyLogoURL: carrier.carrierImage,
+            note: carrier.transferInfo ? "С пересадкой" : nil,
+            date: baseDate,
+            departureTime: departureDate,
+            arrivalTime: arrivalDate,
+            duration: TimeInterval(durationHours * 3600)
+        )
     }
 }
 
-// MARK: - Preview
+//MARK: - Preview
 #Preview {
-    let mockRouteInfo = RouteInfo(
-        fromCity: City(name: "Москва", stations: [Station(name: "Ярославский вокзал")]),
-        fromStation: Station(name: "Ярославский вокзал"),
-        toCity: City(name: "Санкт-Петербург", stations: [Station(name: "Балтийский вокзал")]),
-        toStation: Station(name: "Балтийский вокзал")
+    let moscow = City(name: "Москва", stations: [
+        Station(name: "Киевский вокзал", code: "KV"),
+        Station(name: "Курский вокзал", code: "KR"),
+        Station(name: "Ярославский вокзал", code: "YAR")
+    ])
+    
+    let petersburg = City(name: "Санкт-Петербург", stations: [
+        Station(name: "Балтийский вокзал", code: "SPB-BAL"),
+        Station(name: "Московский вокзал", code: "SPB-MOS"),
+        Station(name: "Финляндский вокзал", code: "SPB-FIN")
+    ])
+    
+    let routeInfo = RouteInfo(
+        fromCity: moscow,
+        fromStation: moscow.stations[0],
+        toCity: petersburg,
+        toStation: petersburg.stations[1]
     )
     
-    let calendar = Calendar.current
-    let now = Date()
-    
-    func createDate(day: Int, hour: Int, minute: Int) -> Date {
-        var components = calendar.dateComponents([.year, .month], from: now)
-        components.day = day
-        components.hour = hour
-        components.minute = minute
-        return calendar.date(from: components)!
+    return NavigationStack {
+        ListOfCarriersView(routeInfo: routeInfo)
     }
-    
-    let mockTrains = [
-        TrainInfo(
-            companyName: "РЖД",
-            companyLogo: Image(systemName: "tram.fill"),
-            note: "Костроме",
-            date: createDate(day: 14, hour: 0, minute: 0),
-            departureTime: createDate(day: 14, hour: 22, minute: 30),
-            arrivalTime: createDate(day: 15, hour: 8, minute: 15),
-            duration: 20 * 3600
-        ),
-        TrainInfo(
-            companyName: "ФГК",
-            companyLogo: Image(systemName: "bolt.car.fill"),
-            note: nil,
-            date: createDate(day: 15, hour: 0, minute: 0),
-            departureTime: createDate(day: 15, hour: 1, minute: 15),
-            arrivalTime: createDate(day: 15, hour: 9, minute: 0),
-            duration: 9 * 3600
-        )
-    ]
-    
-    return ListOfCarriersView(
-        routeInfo: mockRouteInfo,
-        trains: mockTrains
-    )
 }
