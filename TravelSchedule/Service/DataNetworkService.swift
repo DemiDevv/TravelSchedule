@@ -30,8 +30,7 @@ struct DataNetworkService {
     /// Метод вывода расписания рейсов между двумя остановками
     func scheduleBetweenStations(fromStationCode: String, toStationCode: String) async throws -> TwoStationSchedule {
         do {
-            let schedule = try await service.GetScheduleBetweenStations(from: fromStationCode, to: toStationCode)
-            return schedule
+            return try await service.GetScheduleBetweenStations(from: fromStationCode, to: toStationCode)
         } catch {
             print("Ошибка загрузки маршрутов между станциями: \(error.localizedDescription)")
             return TwoStationSchedule(segments: nil)
@@ -41,7 +40,7 @@ struct DataNetworkService {
     /// Метод вывода списка рейсов проходящих через остановку
     private func stationSchedule() async throws {
         do {
-            let _ = try await service.GetStationSchedule(station: "s9600213")
+            _ = try await service.GetStationSchedule(station: "s9600213")
         } catch {
             print("Ошибка загрузки маршрутов станции: \(error.localizedDescription)")
         }
@@ -50,7 +49,7 @@ struct DataNetworkService {
     /// Метод вывода списка остановок на маршруте
     private func routeStations() async throws {
         do {
-            let _ = try await service.GetRouteStations(uid: "028S_3_2")
+            _ = try await service.GetRouteStations(uid: "028S_3_2")
         } catch {
             print("Ошибка загрузки остановок на маршруте: \(error.localizedDescription)")
         }
@@ -59,7 +58,7 @@ struct DataNetworkService {
     /// Метод вывода ближайшей остановки
     private func nearestStations() async throws {
         do  {
-            let _ = try await service.GetNearestStations(lat: 55.813902, lng: 37.597299, distance: 5)
+            _ = try await service.GetNearestStations(lat: 55.813902, lng: 37.597299, distance: 5)
         } catch {
             print("Ошибка загрузки ближайшей остановки: \(error.localizedDescription)")
         }
@@ -68,7 +67,7 @@ struct DataNetworkService {
     /// Метод вывода ближайшего города
     private func nearestCity() async throws {
         do {
-            let _ = try await service.GetNearestCity(lat: 55.813902, lng: 37.597299)
+            _ = try await service.GetNearestCity(lat: 55.813902, lng: 37.597299)
         } catch {
             print("Ошибка загрузки ближайшего города: \(error.localizedDescription)")
         }
@@ -84,7 +83,12 @@ struct DataNetworkService {
             let jsonData = try JSONSerialization.data(withJSONObject: carrierDict, options: [])
             let decoder = JSONDecoder()
             let carrierResponse = try decoder.decode(CarrierResponse.self, from: jsonData)
-            let carrierList = Carrier(name: carrierResponse.title ?? "", logoURL: "RZD", email: carrierResponse.email ?? "", phone: carrierResponse.phone ?? "")
+            let carrierList = Carrier(
+                name: carrierResponse.title ?? "",
+                logoURL: "RZD",
+                email: carrierResponse.email ?? "",
+                phone: carrierResponse.phone ?? ""
+            )
             return carrierList
         } catch {
             print("Ошика загрузки информации о перевозчике: \(error.localizedDescription)")
@@ -107,7 +111,7 @@ struct DataNetworkService {
     /// Метод вывода копирайтов яндекса
     private func copyrights() async throws {
         do {
-            let _ = try await service.GetCopyright()
+            _ = try await service.GetCopyright()
         } catch {
             print("Ошибка загрузки копирайтов Яндекса: \(error.localizedDescription)")
         }
